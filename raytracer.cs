@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Template {
 
-class Game
+class Raytracer
 {
 	// member variables
 	public Surface screen;
