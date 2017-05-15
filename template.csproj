@@ -67,6 +67,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="game.cs" />
+    <Compile Include="LightSource.cs" />
+    <Compile Include="Structs.cs" />
     <Compile Include="surface.cs" />
     <Compile Include="template.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
