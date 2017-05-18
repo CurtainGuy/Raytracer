@@ -24,6 +24,8 @@ namespace Template
         {
             
             // To do: Move the point of the light source in the direction of the ray's origin to prevent shadow acne.
+
+            // Creates a ray between this lightsource and given origin.
             Vector3 direction = origin - position;
             float distance = direction.Length;
             direction.Normalize();
