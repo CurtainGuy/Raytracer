@@ -11,10 +11,7 @@ class Raytracer
 {
 	// member variables
 	public Surface screen;
-    public Vector3 screenCorner0, screenCorner1, screenCorner2;
 
-    // distance from camera to screen (change FOV by changing distance)
-    public int distance = 1;
 	// initialize
 	public void Init()
 	{
@@ -23,10 +20,6 @@ class Raytracer
 
             // the screen where the rays are shot at
             screen = new Surface(512, 512);
-            // the corners of the screen
-            screenCorner0 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, -1, 0);
-            screenCorner1 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(1, -1, 0);
-            screenCorner2 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, 1, 0);
         }
 	// tick: renders one frame
 	public void Tick()
