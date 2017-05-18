@@ -11,7 +11,7 @@ namespace Template
 	public class OpenTKApp : GameWindow
 	{
 		static int screenID;
-		static Game game;
+		static Raytracer rayTracer;
 		static bool terminated = false;
 		protected override void OnLoad( EventArgs e )
 		{
@@ -21,11 +21,11 @@ namespace Template
 			GL.Disable( EnableCap.DepthTest );
 			GL.Hint( HintTarget.PerspectiveCorrectionHint, HintMode.Nicest );
 			ClientSize = new Size( 640, 400 );
-			game = new Game();
-			game.screen = new Surface( Width, Height );
-			Sprite.target = game.screen;
-			screenID = game.screen.GenTexture();
-			game.Init();
+			rayTracer = new Raytracer();
+			rayTracer.screen = new Surface( Width, Height );
+			Sprite.target = rayTracer.screen;
+			screenID = rayTracer.screen.GenTexture();
+			rayTracer.Init();
 		}
 		protected override void OnUnload( EventArgs e )
 		{
@@ -50,7 +50,7 @@ namespace Template
 		protected override void OnRenderFrame( FrameEventArgs e )
 		{
 			// called once per frame; render
-			game.Tick();
+			rayTracer.Tick();
 			if (terminated) 
 			{
 				Exit();
@@ -59,9 +59,9 @@ namespace Template
 			// convert Game.screen to OpenGL texture
 			GL.BindTexture( TextureTarget.Texture2D, screenID );
 			GL.TexImage2D( TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 
-						   game.screen.width, game.screen.height, 0, 
+						   rayTracer.screen.width, rayTracer.screen.height, 0, 
 						   OpenTK.Graphics.OpenGL.PixelFormat.Bgra, 
-						   PixelType.UnsignedByte, game.screen.pixels 
+						   PixelType.UnsignedByte, rayTracer.screen.pixels 
 						 );
 			// clear window contents
 			GL.Clear( ClearBufferMask.ColorBufferBit );

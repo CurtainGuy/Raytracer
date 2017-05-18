@@ -66,7 +66,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="game.cs" />
+    <Compile Include="camera.cs" />
+    <Compile Include="raytracer.cs" />
     <Compile Include="LightSource.cs" />
     <Compile Include="Structs.cs" />
     <Compile Include="surface.cs" />
