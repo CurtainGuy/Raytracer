@@ -1,0 +1,8 @@
+C:\Users\Thomas\Documents\GitHub\Raytracer\bin\Debug\template.exe.config
+C:\Users\Thomas\Documents\GitHub\Raytracer\bin\Debug\template.exe
+C:\Users\Thomas\Documents\GitHub\Raytracer\bin\Debug\template.pdb
+C:\Users\Thomas\Documents\GitHub\Raytracer\bin\Debug\OpenTK.dll
+C:\Users\Thomas\Documents\GitHub\Raytracer\bin\Debug\OpenTK.dll.config
+C:\Users\Thomas\Documents\GitHub\Raytracer\obj\Debug\template.csprojResolveAssemblyReference.cache
+C:\Users\Thomas\Documents\GitHub\Raytracer\obj\Debug\template.exe
+C:\Users\Thomas\Documents\GitHub\Raytracer\obj\Debug\template.pdb
