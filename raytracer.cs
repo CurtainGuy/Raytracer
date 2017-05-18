@@ -12,9 +12,8 @@ namespace Template
     class Raytracer
     {
         // member variables
-        public Surface screen;
-        public Vector3 screenCorner0, screenCorner1, screenCorner2;
-
+        Camera camera;
+        Surface screen;
         // Lijsten
         // List<Primitive> primitives;
         List<LightSource> lightsources;
@@ -31,7 +30,8 @@ namespace Template
 
 
             // the camera from where you see the scene
-            Camera camera = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1));
+            camera = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1));
+        }
 
         public void Render()
         {
@@ -45,9 +45,9 @@ namespace Template
         // tick: renders one frame
         public void Tick()
         {
-            screen.Clear(0);
-            screen.Print("hello world", 2, 2, 0xffffff);
-            screen.Line(2, 20, 160, 20, 0xff0000);
+            camera.screen.Clear(0);
+            camera.screen.Print("hello world", 2, 2, 0xffffff);
+            camera.screen.Line(2, 20, 160, 20, 0xff0000);
         }
     }
 
