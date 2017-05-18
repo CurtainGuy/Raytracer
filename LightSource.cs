@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Template
 {
-    class LightSource
+    public class LightSource
     {
         // Note: onzeker of Vector3 of float3 moet worden gebruikt. 
         Vector3 position;

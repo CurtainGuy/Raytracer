@@ -5,13 +5,13 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
-namespace template
+namespace Template
 {
-    public class camera
+    public class Camera
     {
         Vector3 cameraPosition, cameraDirection;
 
-        public camera(Vector3 position, Vector3 direction)
+        public Camera(Vector3 position, Vector3 direction)
         {
             cameraPosition = position;
             cameraDirection = direction;
