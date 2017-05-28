@@ -19,4 +19,17 @@ namespace Template
             this.t = t;
         }
     }
+
+    public struct Intersection
+    {
+        public Primitive p; // Primitive waarme er wordt intersected.
+        public float d;     // Afstand tussen origin en intersection.
+        public Vector3 n;   // Normal van de intersected primitive.
+        public Intersection(Primitive p, float d, Vector3 n)
+        {
+            this.p = p;
+            this.d = d;
+            this.n = n;
+        }
+    }
 }
