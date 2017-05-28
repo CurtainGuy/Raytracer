@@ -67,8 +67,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="camera.cs" />
+    <Compile Include="Primitive.cs" />
     <Compile Include="raytracer.cs" />
     <Compile Include="LightSource.cs" />
+    <Compile Include="Scene.cs" />
     <Compile Include="Structs.cs" />
     <Compile Include="surface.cs" />
     <Compile Include="template.cs" />
