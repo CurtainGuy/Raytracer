@@ -35,8 +35,10 @@ namespace Template
             screenCorner0 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, -1, 0);
             screenCorner1 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(1, -1, 0);
             screenCorner2 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, 1, 0);
+
+            Render();
         }
-        // tick: renders one frame
+        // tick: renders one frame (isn't being used)
         public void Tick()
         {
             screen.Clear(0);
@@ -56,8 +58,10 @@ namespace Template
                     Ray ray = camera.SendRay(i);
                     Vector3 vector = Trace(ray);
                     // TO DO: zet de kleurvectoren in de screen.
+                    screen.Plot(x, y, (int)FixColor(vector));
                     i++;
                 }
+
             }
         }
 
@@ -66,15 +70,18 @@ namespace Template
         Vector3 Trace(Ray ray)
         {
             Intersection I = SearchIntersect(ray);
-            if (I.p != null) return Vector3.Zero; // Zwart.
+            if (I.p == null) return Vector3.Zero; // Zwart.
             // TO DO: isMirror bool of float bij Primitives.
+            /*
             if (I.p.isMirror())
             {
                 // TO DO: Methode om een ray te reflecteren.
                 return Trace(I, reflect(ray)) * I.p.color;
             }
+            */
             // Dielectric means glass/any seethrough material, appearently...
             // TO DO: isDielectric bool of float bij Primitives.
+            /*
             else if (I.p.isDielectric())
             {
                 // TO DO: Fresnel formule toevoegen. 
@@ -82,9 +89,10 @@ namespace Template
                 // TO DO: Methode om een ray te refracteren.
                 return (f * Trace(I, reflect(ray)) + (1 - f) * Trace(I, refract(ray, ))) * I.p.color;
             }
+            */
             else
             {
-                return DirectionIllumination(I) * I.p.color;
+                return DirectIllumination(I) * I.p.color;
             }
 
         }
@@ -92,16 +100,21 @@ namespace Template
         // TO DO: Dit per lightpoint doen en de waarden meegeven.
         Vector3 DirectIllumination(Intersection I)
         {
-            Vector3 L = lightPos - I.i;
-            float distance = L.Length;
-            L *= (1.0f / distance);
+            Vector3 illumination = new Vector3(1,1,1);
+            foreach (LightSource light in scene.lightsources)
+            {
+                Vector3 L = light.Position - I.i;
+                float distance = L.Length;
+                L *= (1.0f / distance);
 
-            // TO DO: Check of het visible is door middel van shadow rays in de IsVisible methode. 
-            if (!IsVisible(I, L, distance)) return Vector3.Zero; // Zwart.
-            float attenuation = 1 / (distance * distance);
+                // TO DO: Check of het visible is door middel van shadow rays in de IsVisible methode. 
+                //if (!Light.IsVisible(I, L, distance)) return Vector3.Zero; // Zwart.
+                float attenuation = 1 / (distance * distance);
+                // Dotproduct of the normal of the intersection and L.
+                illumination *= FixColor(light.Color) * attenuation * (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
+            }
 
-            // Dotproduct of the normal of the intersection and L.
-            return lightColor * attenuation * (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z); 
+            return illumination; 
 
         }
 
@@ -119,6 +132,11 @@ namespace Template
             }
 
             return new Intersection();
+        }
+
+        public float FixColor(Vector3 color)
+        {
+            return ((int)color.X << 16) + ((int)color.Y << 8) + (color.Z);
         }
     }
 

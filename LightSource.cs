@@ -11,18 +11,20 @@ namespace Template
     {
         // Note: onzeker of Vector3 of float3 moet worden gebruikt. 
         Vector3 position;
+        Vector3 color;
         float intensity;
 
-        public LightSource(Vector3 position, float intensity)
+        public LightSource(Vector3 position, Vector3 color, float intensity)
         {
             this.position = position;
+            this.color = color;
             this.intensity = intensity;
         }
 
         // Checks to see if the line between the light source and a point is unobstructed.
         public bool IsVisible(Vector3 origin)
         {
-            
+
             // To do: Move the point of the light source in the direction of the ray's origin to prevent shadow acne.
 
             // Creates a ray between this lightsource and given origin.
@@ -43,10 +45,14 @@ namespace Template
             get { return position; }
         }
 
+        public Vector3 Color
+        {
+            get { return color; }
+        }
+
         public float Intensity
         {
             get { return intensity; }
         }
-
     }
 }

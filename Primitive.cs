@@ -49,7 +49,7 @@ namespace Template
 
         // Werkt alleen voor buiten de sphere.
         // Zie Structs klasse voor uitleg over Intersection.
-        public Intersection Intersect(Ray ray)
+        public override Intersection Intersect(Ray ray)
         {
             // De Intersection met een sphere volgens de slides.
             Vector3 c = Origin - ray.O;
