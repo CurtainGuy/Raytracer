@@ -46,25 +46,80 @@ namespace Template
 
         public void Render()
         {
-            // Note: 262144 = 512 ^2
-            for (int i = 0; i < 262144; i++)
+            // Dit rendert de hele scene. 
+            int i = 0;
+            for (int y = 0; y < 255; y++)
             {
-                Ray ray = camera.SendRay(i);
-                // Vind de primitive waarmee de ray intersect. 
-                foreach (Primitive p in scene.primitives)
+                for (int x = 0; x < 255; x++)
                 {
-                    // Intersect met de primitive.
-
+                    // De rays zijn opgeslagen in een array in camera. 
+                    Ray ray = camera.SendRay(i);
+                    Vector3 vector = Trace(ray);
+                    // TO DO: zet de kleurvectoren in de screen.
+                    i++;
                 }
-                
-                // Als opgeslagen primitive reflectief/doorzichtbaar is, stuur een secondary ray. Denk aan recursie.
-                // Maak een shadow ray bij elke intersection met primitive. 
-                // Som alle gegeven kleuren op.
-
             }
         }
 
-        
+        // De trace functie van de slides.
+        // TO DO: Recursie cappen.
+        Vector3 Trace(Ray ray)
+        {
+            Intersection I = SearchIntersect(ray);
+            if (I.p != null) return Vector3.Zero; // Zwart.
+            // TO DO: isMirror bool of float bij Primitives.
+            if (I.p.isMirror())
+            {
+                // TO DO: Methode om een ray te reflecteren.
+                return Trace(I, reflect(ray)) * I.p.color;
+            }
+            // Dielectric means glass/any seethrough material, appearently...
+            // TO DO: isDielectric bool of float bij Primitives.
+            else if (I.p.isDielectric())
+            {
+                // TO DO: Fresnel formule toevoegen. 
+                float f = Fresnel();
+                // TO DO: Methode om een ray te refracteren.
+                return (f * Trace(I, reflect(ray)) + (1 - f) * Trace(I, refract(ray, ))) * I.p.color;
+            }
+            else
+            {
+                return DirectionIllumination(I) * I.p.color;
+            }
+
+        }
+
+        // TO DO: Dit per lightpoint doen en de waarden meegeven.
+        Vector3 DirectIllumination(Intersection I)
+        {
+            Vector3 L = lightPos - I.i;
+            float distance = L.Length;
+            L *= (1.0f / distance);
+
+            // TO DO: Check of het visible is door middel van shadow rays in de IsVisible methode. 
+            if (!IsVisible(I, L, distance)) return Vector3.Zero; // Zwart.
+            float attenuation = 1 / (distance * distance);
+
+            // Dotproduct of the normal of the intersection and L.
+            return lightColor * attenuation * (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z); 
+
+        }
+
+        // Vind de primitive waarmee de ray intersect. Als er niets wordt gevonden returnt het een lege intersection. 
+        Intersection SearchIntersect(Ray ray)
+        {
+            foreach (Primitive p in scene.primitives)
+            {
+                p.Intersect(ray); 
+            }
+            foreach (Primitive p in scene.primitives)
+            {
+                if (p.Intersect(ray).p != null)
+                    return p.Intersect(ray);
+            }
+
+            return new Intersection();
+        }
     }
 
 } // namespace Template
