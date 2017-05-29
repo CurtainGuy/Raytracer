@@ -18,14 +18,20 @@ namespace Template
     {
         public Vector3 origin;
         public Vector3 color;
+<<<<<<< HEAD
         public Type type;
+=======
+        public bool mirror;
+        public bool dielectric;
+
+>>>>>>> refs/remotes/origin/master
         public Primitive(Vector3 o, Vector3 c)
         {
             origin = o;
             color = c;
         }
 
-        // kleinen functie voor het berekenen van een dotproduct in 3D.
+        // kleine functie voor het berekenen van een dotproduct in 3D.
         public float Dotproduct3D(Vector3 vec1, Vector3 vec2)
         {
             float sum = (vec1.X * vec2.X) + (vec1.Y * vec2.Y) + (vec1.Z * vec2.Z);
@@ -42,6 +48,16 @@ namespace Template
         {
             get { return origin; }
         }
+
+        /*public bool isMirror
+        {
+            get { return mirror; }
+        }
+
+        public bool isDiElectric
+        {
+            get { return dielectric; }
+        }*/
     }
 
     class Sphere : Primitive
@@ -108,6 +124,36 @@ namespace Template
         public float Height
         {
             get { return height; }
+        }
+
+        public Intersection planeIntersect(Ray ray)
+        {
+            if (Dotproduct3D(Normal, ray.D) == 0)
+            {
+                //als geldt dat de dotproduct = 0, en hij ligt precies op de plane, dan is de afstand dus 0.
+                if (Dotproduct3D((origin - ray.O), Normal) == 0)
+                {
+                    ray.t = 0;
+                }
+
+                //als dotproduct = 0, en hij ligt niet op de plane, dan heeft hij geen enkele intersection en moet er een nieuwe worden gereturned.
+                else
+                {
+                    return new Intersection();
+                }
+            }
+
+            //is de dotproduct niet 0, dan is er dus een intersectie met de plane, hiervoor formule van de slides invullen voor t; t is dan de afstand.
+            else if (Dotproduct3D(Normal, ray.D) != 0)
+            {
+                ray.t = ((Dotproduct3D((origin - ray.O), Normal)) / (Dotproduct3D((origin - ray.O), Normal)));
+            }
+
+            Vector3 i = (ray.O + (ray.t * ray.D)); //dit maakt een vector van ((ray.O.X + ray.t * ray.D.X), (ray.O.Y + ray.t * ray.D.Y), (ray.O.Z + ray.t * ray.D.Z))
+            Vector3 normal = i - origin;
+            normal.Normalize();
+
+            return new Intersection(this, ray.t, normal, i);
         }
     }
 }
