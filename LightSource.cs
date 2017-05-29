@@ -13,6 +13,7 @@ namespace Template
         Vector3 position;
         Vector3 color;
         float intensity;
+        float epsilon = 0.0f;
 
         public LightSource(Vector3 position, Vector3 color, float intensity)
         {
@@ -26,11 +27,16 @@ namespace Template
         {
 
             // To do: Move the point of the light source in the direction of the ray's origin to prevent shadow acne.
-
             // Creates a ray between this lightsource and given origin.
             Vector3 direction = origin - position;
-            float distance = direction.Length;
+            float distance = direction.Length - 2 * epsilon;
+
             direction.Normalize();
+
+            origin.X += epsilon * direction.X;
+            origin.Y += epsilon * direction.Y;
+            origin.Z += epsilon * direction.Z;
+
             Ray ray = new Ray(origin, direction, distance);
 
             // To do: intersection. Primitives are necessary for this.

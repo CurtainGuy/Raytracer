@@ -21,11 +21,13 @@ namespace Template
 
             // Add primitives....
 
-            Vector3 Sposition = new Vector3(0, 0, 8);
+            Vector3 Sposition = new Vector3(0, 0, 2);
             Vector3 Scolor = new Vector3(255, 0, 0);
-            Sphere sphere = new Sphere(3, Sposition, Scolor);
+            Sphere sphere = new Sphere(0.5f, Sposition, Scolor);
 
             primitives.Add(sphere);
+
+            primitives.Add(new Plane(new Vector3(0, 0, -1), 0, 0, new Vector3(0, 0, 20), new Vector3(255, 255, 255)));
 
             // Add lightsources
             Vector3 Lposition = new Vector3(0, 30, 8);

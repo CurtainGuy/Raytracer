@@ -123,7 +123,7 @@ namespace Template
             get { return height; }
         }
 
-        public Intersection planeIntersect(Ray ray)
+        public override Intersection Intersect(Ray ray)
         {
             if (Dotproduct3D(Normal, ray.D) == 0)
             {
