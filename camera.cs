@@ -28,19 +28,20 @@ namespace Template
         void ScreenSetup()
         {
             // Eerste 1 is de maximale x van de screen, 2e is de minimale x.
-            float multiplier = (1 - -1) / 512;
+            float multiplier = (1 - -1) / 512.0000f;
             int i = 0;
-            for(int y = 0; y < 512; y++)
+            for(float y = 0; y < 512; y++)
             {
-                for(int x = 0; x < 512; x++)
+                for(float x = 0; x < 512; x++)
                 {
                     // De 1tjes bij x en y zijn x1, ofwel minimale x van de screen. 
                     // De 1 bij z * de afstand tussen de camera en het scherm.
                     // Dit berekent de normals tussen de camera en de pixels van het scherm.
-                    screen[i] = new Vector3(multiplier * x + 1, multiplier * y - 1, 1) - cameraPosition;
+                    screen[i] = new Vector3(multiplier * x - 1.0000f, multiplier * -1.0000f * y + 1.0000f, 1.0000f) - cameraPosition;
                     screen[i].Normalize();
                     i++;
                 }
+                
             }
         }
 
