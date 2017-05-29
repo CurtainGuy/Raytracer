@@ -28,9 +28,7 @@ namespace Template
             camera = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1));
             
             scene = new Scene(camera.CameraPosition);
-
-            // the screen where the rays are shot at
-            screen = new Surface(512, 512);
+            
             // the corners of the screen
             screenCorner0 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, -1, 0);
             screenCorner1 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(1, -1, 0);
