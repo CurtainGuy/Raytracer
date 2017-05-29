@@ -39,7 +39,7 @@ namespace Template
             get { return origin; }
         }
 
-        public bool isMirror
+        /*public bool isMirror
         {
             get { return mirror; }
         }
@@ -47,7 +47,7 @@ namespace Template
         public bool isDiElectric
         {
             get { return dielectric; }
-        }
+        }*/
     }
 
     class Sphere : Primitive
