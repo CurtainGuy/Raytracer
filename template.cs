@@ -23,9 +23,9 @@ namespace Template
 			ClientSize = new Size( 640, 400 );
 			rayTracer = new Raytracer();
 			rayTracer.screen = new Surface( Width, Height );
-			Sprite.target = rayTracer.screen;
+            rayTracer.Init();
+            Sprite.target = rayTracer.screen;
 			screenID = rayTracer.screen.GenTexture();
-			rayTracer.Init();
 		}
 		protected override void OnUnload( EventArgs e )
 		{
@@ -50,7 +50,7 @@ namespace Template
 		protected override void OnRenderFrame( FrameEventArgs e )
 		{
 			// called once per frame; render
-			rayTracer.Tick();
+			//rayTracer.Tick();
 			if (terminated) 
 			{
 				Exit();
