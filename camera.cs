@@ -47,7 +47,7 @@ namespace Template
         public Ray SendRay(int i)
         {
             // Momenteel is 5 de lengte van de ray als placeholder.
-            return ray = new Ray(cameraPosition, screen[i], 5);
+            return ray = new Ray(cameraPosition, screen[i], int.MaxValue);
         }
         
         public Vector3 CameraPosition
