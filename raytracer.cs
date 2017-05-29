@@ -71,7 +71,7 @@ namespace Template
             if (I.p.isMirror())
             {
                 // TO DO: Methode om een ray te reflecteren.
-                return Trace(I, reflect(ray)) * I.p.color;
+                return Trace(Reflect(ray, I)) * I.p.color;
             }
             // Dielectric means glass/any seethrough material, appearently...
             // TO DO: isDielectric bool of float bij Primitives.
@@ -80,13 +80,25 @@ namespace Template
                 // TO DO: Fresnel formule toevoegen. 
                 float f = Fresnel();
                 // TO DO: Methode om een ray te refracteren.
-                return (f * Trace(I, reflect(ray)) + (1 - f) * Trace(I, refract(ray, ))) * I.p.color;
+                return (f * Trace(Reflect(ray, I)) + (1 - f) * Trace(Refract(ray, I))) * I.p.color;
             }
             else
             {
                 return DirectionIllumination(I) * I.p.color;
             }
 
+        }
+
+        public Ray Reflect(Ray ray, Intersection I)
+        {
+            Vector3 temp = ray.D - 2 * I.n * ((I.n.X * ray.D.X) + (I.n.Y * ray.D.Y) + (I.n.Z * ray.D.Z));
+            temp.Normalize();
+            return new Ray(I.i, temp, ray.t);
+        }
+
+        public Ray Refract(Ray ray, Intersection I)
+        {
+            
         }
 
         // TO DO: Dit per lightpoint doen en de waarden meegeven.
