@@ -22,6 +22,8 @@ namespace Template
             // Add primitives....
             primitives.Add(new Sphere(.5f, new Vector3(0, 0, 2), new Vector3(255, 0, 0)));
 
+            //primitives.Add(new Sphere(.5f, new Vector3(0, 0, 1), new Vector3(1, 1, 1), false, true));
+
             primitives.Add(new Plane(new Vector3(0, 1, 0), 0, 0, new Vector3(0, -2, 0), new Vector3(255, 255, 255)));
             
             primitives.Add(new Plane(new Vector3(1, 0, 0), 0, 0, new Vector3(-.5f, 0, 0), new Vector3(1, 1, 5), true));

@@ -81,7 +81,6 @@ namespace Template
                 debugraylength = ray.t; 
                 return Vector3.Zero; // Zwart.
             }
-            // TO DO: isMirror bool of float bij Primitives.
 
             if (I.p.Mirror)
             {
@@ -91,14 +90,14 @@ namespace Template
                     return Vector3.Zero;
                 }
                 recursion++;
-                // TO DO: Methode om een ray te reflecteren.
+                // Methode om een ray te reflecteren.
                 return Trace(Reflect(ray, I)) * I.p.color;
             }
             /*
             // Dielectric means glass/any seethrough material, appearently...
             // TO DO: isDielectric bool of float bij Primitives.
             
-            else if (I.p.Dielectric)
+            else if (I.p.DiElectric)
             {
                 // TO DO: Fresnel formule toevoegen. 
                 float f = Fresnel();
