@@ -22,7 +22,7 @@ namespace Template
         }
 
         // Checks to see if the line between the light source and a point is unobstructed.
-        public bool IsVisible(Vector3 origin)
+        public bool IsVisible(Vector3 origin, List<Primitive> primitives)
         {
 
             // To do: Move the point of the light source in the direction of the ray's origin to prevent shadow acne.
@@ -34,10 +34,13 @@ namespace Template
             Ray ray = new Ray(origin, direction, distance);
 
             // To do: intersection. Primitives are necessary for this.
-            if (true)
+            foreach (Primitive p in primitives)
+            {
+                p.Intersect(ray);
+                if (p.Intersect(ray).p != null)
+                    return true;
+            }
                 return false;
-            else
-                return true;
         }
 
         public Vector3 Position
