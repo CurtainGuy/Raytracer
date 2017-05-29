@@ -57,10 +57,11 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
-                    if (y == 256  && x % 10 == 0)
-                        DrawDebugRay(ray);
+                    
                     Vector3 vector = Trace(ray);
                     screen.Plot(x, y, FixColor(vector));
+                    if (y == 256 && x % 10 == 0)
+                        DrawDebugRay(ray);
                     i++;
                 }
                 
@@ -156,6 +157,11 @@ namespace Template
                 ConverttoDebugY(camera.CameraPosition.Z),
                 ConverttoDebugX(ray.D.X),
                 ConverttoDebugY(ray.D.Z), FixColor(new Vector3(255, 0, 0)));
+
+            screen.Line(ConverttoDebugX(ray.D.X),
+                ConverttoDebugY(ray.D.Z),
+                ConverttoDebugX(ray.D.X * 8),
+                ConverttoDebugY(ray.D.Z * 8), FixColor(new Vector3(255, 255, 0)));
         }
 
         void DrawDebug()
@@ -165,8 +171,14 @@ namespace Template
             screen.Line(ConverttoDebugX(screenCorner0.X), ConverttoDebugY(screenCorner0.Z), 
                 ConverttoDebugX(screenCorner1.X), ConverttoDebugY(screenCorner1.Z), FixColor(new Vector3(255, 255, 255)));
 
+            List<Sphere> spheres = new List<Sphere>();
+            foreach(Primitive p in scene.primitives)
+            {
+                if (p.type == Type.Sphere)
+                    spheres.Add((Sphere)p);
+            }
             float angle = 2 * (float)Math.PI / 100;
-            foreach (Sphere s in scene.primitives)
+            foreach (Sphere s in spheres)
             {
                 
                 float newradius = (float)Math.Sqrt((s.Radius * s.Radius) - (s.Origin.Y * s.origin.Y));
