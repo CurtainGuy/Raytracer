@@ -20,9 +20,9 @@ namespace Template
             lightsources = new List<LightSource>();
 
             // Add primitives....
-            Vector3 Sposition = new Vector3(5, 5, 5);
+            Vector3 Sposition = new Vector3(0, 0, 8);
             Vector3 Scolor = new Vector3(255, 1, 1);
-            Sphere sphere = new Sphere(10, Sposition, Scolor);
+            Sphere sphere = new Sphere(3, Sposition, Scolor);
             primitives.Add(sphere);
 
             // Add lightsources
