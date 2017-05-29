@@ -123,7 +123,7 @@ namespace Template
             get { return height; }
         }
 
-        public Intersection planeIntersect(Ray ray)
+        public override Intersection Intersect(Ray ray)
         {
             if (Dotproduct3D(Normal, ray.D) == 0)
             {
@@ -139,17 +139,19 @@ namespace Template
                     return new Intersection();
                 }
             }
-
             //is de dotproduct niet 0, dan is er dus een intersectie met de plane, hiervoor formule van de slides invullen voor t; t is dan de afstand.
-            else if (Dotproduct3D(Normal, ray.D) != 0)
+            else 
             {
-                ray.t = ((Dotproduct3D((origin - ray.O), Normal)) / (Dotproduct3D((origin - ray.O), Normal)));
+                //ray.t = ((Dotproduct3D((origin - ray.O), Normal)) / (Dotproduct3D((origin - ray.O), Normal)));
+                ray.t = -1 * (Dotproduct3D(ray.O, Normal) + origin.Length) / Dotproduct3D(ray.D, Normal);
+                if (ray.t < 0)
+                    return new Intersection();
             }
 
             Vector3 i = (ray.O + (ray.t * ray.D)); //dit maakt een vector van ((ray.O.X + ray.t * ray.D.X), (ray.O.Y + ray.t * ray.D.Y), (ray.O.Z + ray.t * ray.D.Z))
             Vector3 normal = i - origin;
             normal.Normalize();
-
+            
             return new Intersection(this, ray.t, normal, i);
         }
     }
