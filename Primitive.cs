@@ -8,10 +8,17 @@ using System.Threading.Tasks;
 namespace Template
 {
 
+    public enum Type
+    {
+        Sphere,
+        Plane
+    }
+
     public class Primitive
     {
         public Vector3 origin;
         public Vector3 color;
+        public Type type;
         public Primitive(Vector3 o, Vector3 c)
         {
             origin = o;
@@ -45,6 +52,7 @@ namespace Template
             : base(o, c)
         {
             radius = r;
+            type = Type.Sphere;
         }
 
         // Werkt alleen voor buiten de sphere.
@@ -85,6 +93,7 @@ namespace Template
             normal = n;
             width = w;
             height = h;
+            type = Type.Plane;
         }
 
         public Vector3 Normal
