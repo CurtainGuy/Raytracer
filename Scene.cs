@@ -20,18 +20,14 @@ namespace Template
             lightsources = new List<LightSource>();
 
             // Add primitives....
+            primitives.Add(new Sphere(.5f, new Vector3(0, 0, 2), new Vector3(255, 0, 0)));
 
-            Vector3 Sposition = new Vector3(0, 0, 8);
-            Vector3 Scolor = new Vector3(255, 1, 1);
-            Sphere sphere = new Sphere(3, Sposition, Scolor);
-
-            primitives.Add(sphere);
             primitives.Add(new Plane(new Vector3(0, 1, 0), 0, 0, new Vector3(0, -2, 0), new Vector3(255, 255, 255)));
+            
+            primitives.Add(new Plane(new Vector3(1, 0, 0), 0, 0, new Vector3(-.5f, 0, 0), new Vector3(1, 1, 5), true));
 
             // Add lightsources
-            Vector3 Lposition = new Vector3(5, 20, 5);
-            Vector3 Lcolor = new Vector3(1, 1, 1);
-            LightSource light = new LightSource(Lposition, Lcolor, 100);
+            //lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 100));
         }
     }
 }

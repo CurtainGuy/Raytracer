@@ -22,10 +22,12 @@ namespace Template
         public bool mirror;
         public bool dielectric;
 
-        public Primitive(Vector3 o, Vector3 c)
+        public Primitive(Vector3 o, Vector3 c, bool m = false, bool d = false)
         {
             origin = o;
             color = c;
+            mirror = m;
+            dielectric = d;
         }
 
         // kleine functie voor het berekenen van een dotproduct in 3D.
@@ -46,23 +48,23 @@ namespace Template
             get { return origin; }
         }
 
-        /*public bool isMirror
+        public bool Mirror
         {
             get { return mirror; }
         }
 
-        public bool isDiElectric
+        public bool DiElectric
         {
             get { return dielectric; }
-        }*/
+        }
     }
 
     class Sphere : Primitive
     {
         float radius;
 
-        public Sphere(float r, Vector3 o, Vector3 c)
-            : base(o, c)
+        public Sphere(float r, Vector3 o, Vector3 c , bool m = false, bool d = false)
+            : base(o, c, m, d)
         {
             radius = r;
             type = Type.Sphere;
@@ -100,8 +102,8 @@ namespace Template
     {
         Vector3 normal;
         float width, height;
-        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c)
-            :base(o, c)
+        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c, bool m = false, bool d = false)
+            :base(o, c, m, d)
         {
             normal = n;
             width = w;

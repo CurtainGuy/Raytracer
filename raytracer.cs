@@ -20,6 +20,7 @@ namespace Template
 
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
+        int recursion = 0;
         // initialize
         public void Init()
         {
@@ -81,17 +82,23 @@ namespace Template
                 return Vector3.Zero; // Zwart.
             }
             // TO DO: isMirror bool of float bij Primitives.
-            /*
-            if (I.p.isMirror())
+
+            if (I.p.Mirror)
             {
+                if (recursion > 10)
+                {
+                    recursion = 0;
+                    return Vector3.Zero;
+                }
+                recursion++;
                 // TO DO: Methode om een ray te reflecteren.
                 return Trace(Reflect(ray, I)) * I.p.color;
             }
-            
+            /*
             // Dielectric means glass/any seethrough material, appearently...
             // TO DO: isDielectric bool of float bij Primitives.
             
-            else if (I.p.isDielectric())
+            else if (I.p.Dielectric)
             {
                 // TO DO: Fresnel formule toevoegen. 
                 float f = Fresnel();
@@ -128,13 +135,11 @@ namespace Template
                 Vector3 L = light.Position - I.i;
                 float distance = L.Length;
                 L *= (1.0f / distance);
-
-                // TO DO: Check of het visible is door middel van shadow rays in de IsVisible methode. 
-                //if (!Light.IsVisible(I, L, distance)) return Vector3.Zero; // Zwart.
+                // check of de lightsource visible is, zo niet, return zwart
                 if (!light.IsVisible(I.i, scene.primitives)) return Vector3.Zero; // Zwart.
                 float attenuation = 1 / (distance * distance);
                 // Dotproduct of the normal of the intersection and L.
-                illumination *= FixColor(light.Color) * attenuation * (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
+                illumination *= FixColor(light.Color) * attenuation * ((I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z)) * light.Intensity;
             }
 
             return illumination; 
