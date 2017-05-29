@@ -76,10 +76,10 @@ namespace Template
                 // TO DO: Methode om een ray te reflecteren.
                 return Trace(I, reflect(ray)) * I.p.color;
             }
-            */
+            
             // Dielectric means glass/any seethrough material, appearently...
             // TO DO: isDielectric bool of float bij Primitives.
-            /*
+            
             else if (I.p.isDielectric())
             {
                 // TO DO: Fresnel formule toevoegen. 

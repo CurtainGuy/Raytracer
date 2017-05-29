@@ -18,7 +18,7 @@ namespace Template
             cameraPosition = position;
             cameraDirection = direction;
             screen = new Vector3[512 * 512];
-            
+
             ScreenSetup();
         }
 
