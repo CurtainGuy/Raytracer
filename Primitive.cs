@@ -18,13 +18,10 @@ namespace Template
     {
         public Vector3 origin;
         public Vector3 color;
-<<<<<<< HEAD
         public Type type;
-=======
         public bool mirror;
         public bool dielectric;
 
->>>>>>> refs/remotes/origin/master
         public Primitive(Vector3 o, Vector3 c)
         {
             origin = o;
