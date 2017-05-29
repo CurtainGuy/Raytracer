@@ -12,13 +12,16 @@ namespace Template
     {
         public Vector3 origin;
         public Vector3 color;
+        public bool mirror;
+        public bool dielectric;
+
         public Primitive(Vector3 o, Vector3 c)
         {
             origin = o;
             color = c;
         }
 
-        // kleinen functie voor het berekenen van een dotproduct in 3D.
+        // kleine functie voor het berekenen van een dotproduct in 3D.
         public float Dotproduct3D(Vector3 vec1, Vector3 vec2)
         {
             float sum = (vec1.X * vec2.X) + (vec1.Y * vec2.Y) + (vec1.Z * vec2.Z);
@@ -35,6 +38,16 @@ namespace Template
         {
             get { return origin; }
         }
+
+        /*public bool isMirror
+        {
+            get { return mirror; }
+        }
+
+        public bool isDiElectric
+        {
+            get { return dielectric; }
+        }*/
     }
 
     class Sphere : Primitive
