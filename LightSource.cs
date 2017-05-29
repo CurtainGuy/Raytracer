@@ -37,7 +37,7 @@ namespace Template
             foreach (Primitive p in primitives)
             {
                 p.Intersect(ray);
-                if (p.Intersect(ray).p == null)
+                if (p.Intersect(ray).p != null)
                     return true;
             }
                 return false;
