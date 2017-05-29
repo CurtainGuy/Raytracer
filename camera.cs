@@ -39,6 +39,7 @@ namespace Template
                     // Dit berekent de normals tussen de camera en de pixels van het scherm.
                     screen[i] = new Vector3(multiplier * x + 1, multiplier * y - 1, 1) - cameraPosition;
                     screen[i].Normalize();
+                    i++;
                 }
             }
         }

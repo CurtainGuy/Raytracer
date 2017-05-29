@@ -107,7 +107,8 @@ namespace Template
 
                 // TO DO: Check of het visible is door middel van shadow rays in de IsVisible methode. 
                 //if (!Light.IsVisible(I, L, distance)) return Vector3.Zero; // Zwart.
-                if (!light.IsVisible(I.i, scene.primitives)) return Vector3.Zero; // Zwart.
+                if (!light.IsVisible(I.i, scene.primitives)) 
+                    return Vector3.Zero; // Zwart.
                 float attenuation = 1 / (distance * distance);
                 // Dotproduct of the normal of the intersection and L.
                 illumination *= FixColor(light.Color) * attenuation * (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
