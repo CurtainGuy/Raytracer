@@ -26,6 +26,7 @@ namespace Template
             Sphere sphere = new Sphere(3, Sposition, Scolor);
 
             primitives.Add(sphere);
+            primitives.Add(new Plane(new Vector3(0, 1, 0), 0, 0, new Vector3(0, -2, 0), new Vector3(255, 255, 255)));
 
             // Add lightsources
             Vector3 Lposition = new Vector3(5, 20, 5);

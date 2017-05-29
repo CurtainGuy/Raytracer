@@ -46,6 +46,7 @@ namespace Template
             screen.Line(2, 20, 160, 20, 0xff0000);
         }
 
+        float debugraylength;
         public void Render()
         {
             DrawDebug();
@@ -59,9 +60,10 @@ namespace Template
                     Ray ray = camera.SendRay(i);
                     
                     Vector3 vector = Trace(ray);
-                    screen.Plot(x, y, FixColor(vector));
                     if (y == 256 && x % 10 == 0)
-                        DrawDebugRay(ray);
+                        DrawDebugRay(new Ray(ray.O, ray.D, debugraylength));
+                    screen.Plot(x, y, FixColor(vector));
+                    
                     i++;
                 }
                 
@@ -73,7 +75,11 @@ namespace Template
         Vector3 Trace(Ray ray)
         {
             Intersection I = SearchIntersect(ray);
-            if (I.p == null) return Vector3.Zero; // Zwart.
+            if (I.p == null)
+            {
+                debugraylength = ray.t; 
+                return Vector3.Zero; // Zwart.
+            }
             // TO DO: isMirror bool of float bij Primitives.
             /*
             if (I.p.isMirror())
@@ -95,6 +101,7 @@ namespace Template
             */
             else
             {
+                debugraylength = I.d;
                 return DirectIllumination(I) * I.p.color;
             }
 
@@ -144,7 +151,9 @@ namespace Template
             foreach (Primitive p in scene.primitives)
             {
                 if (p.Intersect(ray).p != null)
+                {
                     return p.Intersect(ray);
+                }
             }
 
             return new Intersection();
@@ -159,8 +168,8 @@ namespace Template
 
             screen.Line(ConverttoDebugX(ray.D.X),
                 ConverttoDebugY(ray.D.Z),
-                ConverttoDebugX(ray.D.X * 8),
-                ConverttoDebugY(ray.D.Z * 8), FixColor(new Vector3(255, 255, 0)));
+                ConverttoDebugX(ray.D.X * ray.t),
+                ConverttoDebugY(ray.D.Z * ray.t), FixColor(new Vector3(255, 255, 0)));
         }
 
         void DrawDebug()
@@ -195,12 +204,12 @@ namespace Template
         
         int ConverttoDebugX(float x)
         {
-            return (int)(767 + (x * 64));
+            return (int)(767 + (x * 48));
         }
 
         int ConverttoDebugY(float z)
         {
-            return (int)(500 - (z * 64));
+            return (int)(500 - (z * 48));
         }
 
         public int FixColor(Vector3 color)
