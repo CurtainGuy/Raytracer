@@ -47,17 +47,17 @@ namespace Template
 			var keyboard = OpenTK.Input.Keyboard.GetState();
 			if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
             if (keyboard[Key.Left]) //beweeg het scherm naar links
-                { rayTracer.CameraX -= 1; rayTracer.camera.CameraTransform(-0.5f, 0, 0); rayTracer.screen.Clear(0); }
+                { rayTracer.CameraX -= 1; rayTracer.camera.CameraTransform(-1, 0, 0); rayTracer.screen.Clear(0); }
             if(keyboard[Key.Right]) //beweeg het scherm naar rechts
-                { rayTracer.CameraX += 1; rayTracer.camera.CameraTransform(0.5f, 0, 0); rayTracer.screen.Clear(0); }
+                { rayTracer.CameraX += 1; rayTracer.camera.CameraTransform(1, 0, 0); rayTracer.screen.Clear(0); }
             if(keyboard[Key.Up]) //beweeg het scherm naar boven (Z- as)
-                { rayTracer.CameraZ -= 1; rayTracer.camera.CameraTransform(0, 0, 0.5f); rayTracer.screen.Clear(0); }
+                { rayTracer.CameraZ -= 1; rayTracer.camera.CameraTransform(0, 0, 1); rayTracer.screen.Clear(0); }
             if(keyboard[Key.Down]) //beweeg het scherm naar beneden (Z- as)
-                { rayTracer.CameraZ += 1; rayTracer.camera.CameraTransform(0, 0, -0.5f); rayTracer.screen.Clear(0); }
+                { rayTracer.CameraZ += 1; rayTracer.camera.CameraTransform(0, 0, -1); rayTracer.screen.Clear(0); }
             if(keyboard[Key.KeypadPlus]) //beweeg het scherm naar boven (Y-as)
-                { rayTracer.camera.CameraTransform(0, 0.5f, 0); rayTracer.screen.Clear(0); }
+                { rayTracer.camera.CameraTransform(0, 1, 0); rayTracer.screen.Clear(0); }
             if(keyboard[Key.KeypadMinus]) //beweeg het scherm naar beneden (Y-as)
-                { rayTracer.camera.CameraTransform(0, -0.5f, 0); rayTracer.screen.Clear(0); }
+                { rayTracer.camera.CameraTransform(0, -1, 0); rayTracer.screen.Clear(0); }
             if (keyboard[Key.Enter]) //druk op Enter om het beeld te renderen
             {
                 rayTracer.Render();

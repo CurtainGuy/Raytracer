@@ -55,11 +55,7 @@ namespace Template
         Vector3[] colors;
         public void Render()
         {
-<<<<<<< HEAD
             colors = new Vector3[512 * 512];
-            
-=======
->>>>>>> refs/remotes/origin/master
             // Dit rendert de hele scene. 
             int i = 0;
             for (int y = 0; y < 512; y++)
@@ -68,13 +64,11 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
-                    if (x == 100 && y == 341)
-                        ;
                     if (y == 256 && x % 10 == 0)
                     {
                         colors[i] = Trace(ray, true, maxRecursion);
                         DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
-                        DrawDebugRay(new Ray(ray.D, ray.D, debugraylength), new Vector3(255, 255, 0));
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, debugraylength - 1), new Vector3(255, 255, 0));
                     }
                     else
                         colors[i] = Trace(ray, false, maxRecursion);
@@ -198,22 +192,10 @@ namespace Template
 
         public void DrawDebugRay(Ray ray, Vector3 color )
         {
-<<<<<<< HEAD
             screen.Line(ConverttoDebugX(ray.O.X),
                 ConverttoDebugY(ray.O.Z),
-                ConverttoDebugX(ray.D.X * ray.t),
-                ConverttoDebugY(ray.D.Z * ray.t), FixColor(color));
-=======
-            screen.Line(CameraX,
-                    CameraZ,
-                    ConverttoDebugX(ray.D.X * ray.t) - 767 + CameraX,
-                    CameraZ - 500 + ConverttoDebugY(ray.D.Z * ray.t), FixColor(new Vector3(255, 255, 0)));
-
-            screen.Line(CameraX,
-                CameraZ,
-                ConverttoDebugX(ray.D.X) - 767 + CameraX,
-                CameraZ - 500 + ConverttoDebugY(ray.D.Z), FixColor(new Vector3(255, 0, 0)));
->>>>>>> refs/remotes/origin/master
+                ConverttoDebugX((ray.D.X * ray.t) + ray.O.X),
+                ConverttoDebugY((ray.D.Z * ray.t) + ray.O.Z), FixColor(color));
         }
 
         void DrawDebug()
