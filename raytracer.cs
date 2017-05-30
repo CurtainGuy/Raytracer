@@ -52,27 +52,31 @@ namespace Template
         public void Render()
         {
             colors = new Vector3[512 * 512];
-            DrawDebug();
+            
             // Dit rendert de hele scene. 
             int i = 0;
             for (int y = 0; y < 512; y++)
             {
                 for (int x = 0; x < 512; x++)
                 {
-                    if (y == 500)
-                        ;
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
                     
-                    colors[i] = Trace(ray);
                     if (y == 256 && x % 10 == 0)
-                        DrawDebugRay(new Ray(ray.O, ray.D, debugraylength));
-                    
-                    
+                    {
+                        colors[i] = Trace(ray, true);
+                        DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
+                        DrawDebugRay(new Ray(ray.D, ray.D, debugraylength), new Vector3(255, 255, 0));
+                    }
+                    else
+                        colors[i] = Trace(ray, false);
+
+
                     i++;
                 }
                 
             }
+            DrawDebug();
             i = 0;
             for (int y = 0; y < 512; y++)
             {
@@ -86,7 +90,7 @@ namespace Template
 
         // De trace functie van de slides.
         // TO DO: Recursie cappen.
-        Vector3 Trace(Ray ray)
+        Vector3 Trace(Ray ray, bool debug)
         {
             Intersection I = SearchIntersect(ray);
             if (I.p == null)
@@ -104,7 +108,7 @@ namespace Template
                 }
                 recursion++;
                 // Methode om een ray te reflecteren.
-                return Trace(Reflect(ray, I)) * I.p.color;
+                return Trace(Reflect(ray, I), debug) * I.p.color;
             }
             /*
             // Dielectric means glass/any seethrough material, appearently...
@@ -121,7 +125,7 @@ namespace Template
             else
             {
                 debugraylength = I.d;
-                return DirectIllumination(I) * I.p.color;
+                return DirectIllumination(I, debug) * I.p.color;
             }
 
         }
@@ -139,7 +143,7 @@ namespace Template
         }
 
         // TO DO: Dit per lightpoint doen en de waarden meegeven.
-        Vector3 DirectIllumination(Intersection I)
+        Vector3 DirectIllumination(Intersection I, bool debug)
         {
             Vector3 illumination = new Vector3(0, 0, 0);
             foreach (LightSource light in scene.lightsources)
@@ -148,6 +152,8 @@ namespace Template
                 Vector3 L = light.Position - I.i;
                 float distance = L.Length;
                 L.Normalize();
+                if(debug)
+                    DrawDebugRay(new Ray(I.i, L, distance), new Vector3(200, 200, 200));
                 // check of de lightsource visible is, zo niet, return zwart
                 if (!light.IsVisible(I, scene.primitives)) continue; // Zwart.
                 float attenuation = light.Intensity / (distance * distance);
@@ -176,19 +182,12 @@ namespace Template
             return new Intersection();
         }
 
-        void DrawDebugRay(Ray ray)
+        public void DrawDebugRay(Ray ray, Vector3 color )
         {
-            screen.Line(ConverttoDebugX(camera.CameraPosition.X),
-                ConverttoDebugY(camera.CameraPosition.Z),
-                ConverttoDebugX(ray.D.X),
-                ConverttoDebugY(ray.D.Z), FixColor(new Vector3(255, 0, 0)));
-
-
-            screen.Line(ConverttoDebugX(ray.D.X),
-                ConverttoDebugY(ray.D.Z),
+            screen.Line(ConverttoDebugX(ray.O.X),
+                ConverttoDebugY(ray.O.Z),
                 ConverttoDebugX(ray.D.X * ray.t),
-                ConverttoDebugY(ray.D.Z * ray.t), FixColor(new Vector3(255, 255, 0)));
-
+                ConverttoDebugY(ray.D.Z * ray.t), FixColor(color));
         }
 
         void DrawDebug()
