@@ -54,9 +54,9 @@ namespace Template
                 { rayTracer.CameraZ -= 1; rayTracer.camera.CameraTransform(0, 0, 0.5f); rayTracer.screen.Clear(0); }
             if(keyboard[Key.Down]) //beweeg het scherm naar beneden (Z- as)
                 { rayTracer.CameraZ += 1; rayTracer.camera.CameraTransform(0, 0, -0.5f); rayTracer.screen.Clear(0); }
-            if(keyboard[Key.KeypadPlus])
+            if(keyboard[Key.KeypadPlus]) //beweeg het scherm naar boven (Y-as)
                 { rayTracer.camera.CameraTransform(0, 0.5f, 0); rayTracer.screen.Clear(0); }
-            if(keyboard[Key.KeypadMinus])
+            if(keyboard[Key.KeypadMinus]) //beweeg het scherm naar beneden (Y-as)
                 { rayTracer.camera.CameraTransform(0, -0.5f, 0); rayTracer.screen.Clear(0); }
             if (keyboard[Key.Enter]) //druk op Enter om het beeld te renderen
             {
