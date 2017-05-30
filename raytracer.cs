@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
 
 namespace Template
 {
@@ -17,6 +14,8 @@ namespace Template
         
         Camera camera;
         Scene scene;
+
+        Surface pattern;
 
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
@@ -37,6 +36,7 @@ namespace Template
             screenCorner1 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(1, -1, 0);
             screenCorner2 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, 1, 0);
 
+            pattern = new Surface("../../assets/pattern.png");
             Render();
         }
         // tick: renders one frame (isn't being used)
@@ -59,9 +59,7 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
-                    if (x == 100 && y == 341)
-                        ;
-                    Vector3 vector = Trace(ray, maxRecursion);
+                    Vector3 vector = Trace(ray, 0);
                     if (y == 256 && x % 10 == 0)
                         DrawDebugRay(new Ray(ray.O, ray.D, debugraylength));
                     screen.Plot(x, y, FixColor(vector));
@@ -77,20 +75,21 @@ namespace Template
         Vector3 Trace(Ray ray, int recursion)
         {
             Intersection I = SearchIntersect(ray);
+
             if (I.p == null)
             {
                 debugraylength = ray.t; 
                 return Vector3.Zero; // Zwart.
             }
-
+            Vector3 color = I.p.color;
             if (I.p.Mirror)
             {
-                if (recursion < 0)
+                if (recursion < maxRecursion)
                 {
-                    return Vector3.Zero;
+                    return Trace(Reflect(ray, I), recursion + 1) * color;
                 }
+                return new Vector3(1, 1, 1);
                 // Methode om een ray te reflecteren.
-                return Trace(Reflect(ray, I), recursion - 1) * I.p.color;
             }
             /*
             // Dielectric means glass/any seethrough material, appearently...
@@ -107,16 +106,20 @@ namespace Template
             else
             {
                 debugraylength = I.d;
-                return DirectIllumination(I) * I.p.color;
+                if (I.p is Plane)
+                    color = CreatePattern(I.i, pattern);
+                return DirectIllumination(I) * color;
             }
+
 
         }
 
         public Ray Reflect(Ray ray, Intersection I)
         {
-            Vector3 temp = ray.D - 2 * I.n * ((I.n.X * ray.D.X) + (I.n.Y * ray.D.Y) + (I.n.Z * ray.D.Z));
-            temp.Normalize();
-            return new Ray(I.i, temp, ray.t);
+            Ray seccondaryRay = new Ray();
+            seccondaryRay.D = ray.D - ((2 * I.n) * (Vector3.Dot(ray.D, I.n)));
+            seccondaryRay.O = I.i;
+            return seccondaryRay;
         }
 
         public Ray Refract(Ray ray, Intersection I)
@@ -128,16 +131,20 @@ namespace Template
         Vector3 DirectIllumination(Intersection I)
         {
             Vector3 illumination = new Vector3(0, 0, 0);
+            Ray shadowRay = new Ray();
             foreach (LightSource light in scene.lightsources)
             {
-                // L is shadowray
-                Vector3 L = light.Position - I.i;
-                float distance = L.Length;
-                L.Normalize();
+                // create a shadowray
+                shadowRay.D = light.Position - I.i;
+                shadowRay.O = I.i;
+                shadowRay.t = shadowRay.D.Length;
+                shadowRay.D.Normalize();
+
                 // check of de lightsource visible is, zo niet, return zwart
-                if (!light.IsVisible(I, scene.primitives)) continue; // Zwart.
-                float attenuation = light.Intensity / (distance * distance);
-                float NdotL = (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
+                if (!IsVisible(I, shadowRay)) continue; // Zwart.
+
+                float attenuation = light.Intensity / (shadowRay.t * shadowRay.t);
+                float NdotL = Vector3.Dot(I.n, shadowRay.D);
                 if (NdotL < 0) continue;
                 // Dotproduct of the normal of the intersection and shadowray
                 illumination = light.Color * attenuation * NdotL;
@@ -145,7 +152,23 @@ namespace Template
             }
 
             return illumination; 
+        }
 
+        // Checks to see if the line between the light source and a point is unobstructed.
+        public bool IsVisible(Intersection I, Ray shadowRay)
+        {
+            float tMin = int.MaxValue;
+            foreach (Primitive p in scene.primitives)
+            {
+                float t = p.Intersect(shadowRay).d;
+                if (t > 0 && t < tMin)
+                    tMin = t;
+            }
+
+            if (tMin >= shadowRay.t)
+                return true;
+            else
+                return false;
         }
 
         // Vind de primitive waarmee de ray intersect. Als er niets wordt gevonden returnt het een lege intersection. 
@@ -221,6 +244,36 @@ namespace Template
             if (color.Y > 255) color.Y = 255;
             if (color.Z > 255) color.Z = 255;
             return ((int)color.X << 16) + ((int)color.Y << 8) + (int)(color.Z);
+        }
+
+        public Vector3 CreatePattern(Vector3 P, Surface T)
+        {
+            Vector2 point = new Vector2(P.X, P.Z);
+            int x = (int)Math.Round(point.X * T.width - 0.5);
+
+            //keep x within the range of the surface, as the plane is infinite
+            while (x < 0)
+            {
+                x += T.width;
+            }
+            while (x >= T.width)
+            {
+                x -= T.width;
+            }
+
+            int y = (int)Math.Round(point.Y * T.height - 0.5);
+            //keep y within the range of the surface, as the plane is infinite
+            while (y < 0)
+            {
+                y += T.height;
+            }
+            while (y >= T.height)
+            {
+                y -= T.height;
+            }
+
+            Color col = pattern.bmp.GetPixel(x, y);
+            return new Vector3(col.R, col.G, col.B);
         }
     }
 
