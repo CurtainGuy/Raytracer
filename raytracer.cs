@@ -136,7 +136,7 @@ namespace Template
                 float distance = L.Length;
                 L.Normalize();
                 // check of de lightsource visible is, zo niet, return zwart
-                if (!light.IsVisible(I.i, scene.primitives)) continue; // Zwart.
+                if (!light.IsVisible(I, scene.primitives)) continue; // Zwart.
                 float attenuation = light.Intensity / (distance * distance);
                 float NdotL = (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
                 if (NdotL < 0) continue;
@@ -152,10 +152,6 @@ namespace Template
         // Vind de primitive waarmee de ray intersect. Als er niets wordt gevonden returnt het een lege intersection. 
         Intersection SearchIntersect(Ray ray)
         {
-            foreach (Primitive p in scene.primitives)
-            {
-                p.Intersect(ray); 
-            }
             foreach (Primitive p in scene.primitives)
             {
                 if (p.Intersect(ray).p != null)
