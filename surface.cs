@@ -41,6 +41,7 @@ namespace Template
 	{
 		public int width, height;
 		public int [] pixels;
+        public Bitmap bmp;
 		static bool fontReady = false;
 		static Surface font;
 		static int [] fontRedir;
@@ -54,7 +55,7 @@ namespace Template
         // surface constructor using a file
 		public Surface( string fileName )
 		{
- 			Bitmap bmp = new Bitmap( fileName );
+ 			bmp = new Bitmap( fileName );
 			width = bmp.Width;
 			height = bmp.Height;
 			pixels = new int[width * height];

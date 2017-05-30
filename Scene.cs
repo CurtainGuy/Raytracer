@@ -19,17 +19,20 @@ namespace Template
             primitives = new List<Primitive>();
             lightsources = new List<LightSource>();
 
-            // Add primitives....
-            primitives.Add(new Sphere(.5f, new Vector3(0, 0, 2), new Vector3(255, 1, 1)));
+            // Sphere
+            primitives.Add(new Sphere(.5f, new Vector3(-1, -1.5f, 4), new Vector3(255, 1, 1)));
 
-            //primitives.Add(new Sphere(.5f, new Vector3(1, 0, 2), new Vector3(1, 1, 1), true, false));
+            // Mirror
+            primitives.Add(new Sphere(.5f, new Vector3(1, -1.5f, 4), new Vector3(1, 1, 1), true));
+            primitives.Add(new Sphere(.5f, new Vector3(0, -1.5f, 4), new Vector3(1, 2, 1), true));
 
-            primitives.Add(new Plane(new Vector3(0, 1, 0), 0, 0, new Vector3(0, -2, 0), new Vector3(255, 255, 255)));
+            // Floor
+            primitives.Add(new Plane(new Vector3(0, 1, 0), 0, 0, new Vector3(0, -2, 0), new Vector3(1, 1, 1)));
             
-            //primitives.Add(new Plane(new Vector3(1, 0, 0), 0, 0, new Vector3(-.5f, 0, 0), new Vector3(1, 1, 5), true));
-
             // Add lightsources
-            lightsources.Add(new LightSource(new Vector3(2, 5, 2), new Vector3(1, 1, 1), 15));
+            lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 10));
+            lightsources.Add(new LightSource(new Vector3(0, 0, 0), new Vector3(1, 2, 1), 25));
+            lightsources.Add(new LightSource(new Vector3(-.5f, -1f, 3), new Vector3(2, 1, 1), 5));
         }
     }
 }
