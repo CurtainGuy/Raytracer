@@ -22,10 +22,12 @@ namespace Template
         public bool mirror;
         public bool dielectric;
 
-        public Primitive(Vector3 o, Vector3 c)
+        public Primitive(Vector3 o, Vector3 c, bool m = false, bool d = false)
         {
             origin = o;
             color = c;
+            mirror = m;
+            dielectric = d;
         }
 
         // kleine functie voor het berekenen van een dotproduct in 3D.
@@ -46,23 +48,23 @@ namespace Template
             get { return origin; }
         }
 
-        /*public bool isMirror
+        public bool Mirror
         {
             get { return mirror; }
         }
 
-        public bool isDiElectric
+        public bool DiElectric
         {
             get { return dielectric; }
-        }*/
+        }
     }
 
     class Sphere : Primitive
     {
         float radius;
 
-        public Sphere(float r, Vector3 o, Vector3 c)
-            : base(o, c)
+        public Sphere(float r, Vector3 o, Vector3 c, bool m = false, bool d = false)
+            : base(o, c, m, d)
         {
             radius = r;
             type = Type.Sphere;
@@ -91,7 +93,7 @@ namespace Template
 
         public float Radius
         {
-            get{ return radius; }
+            get { return radius; }
         }
     }
 
@@ -100,8 +102,8 @@ namespace Template
     {
         Vector3 normal;
         float width, height;
-        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c)
-            :base(o, c)
+        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c, bool m = false, bool d = false)
+            : base(o, c, m, d)
         {
             normal = n;
             width = w;
@@ -111,12 +113,12 @@ namespace Template
 
         public Vector3 Normal
         {
-            get{ return normal; }
+            get { return normal; }
         }
 
         public float Width
         {
-            get{ return width; }
+            get { return width; }
         }
         public float Height
         {
@@ -125,34 +127,18 @@ namespace Template
 
         public override Intersection Intersect(Ray ray)
         {
-            if (Dotproduct3D(Normal, ray.D) == 0)
-            {
-                //als geldt dat de dotproduct = 0, en hij ligt precies op de plane, dan is de afstand dus 0.
-                if (Dotproduct3D((origin - ray.O), Normal) == 0)
-                {
-                    ray.t = 0;
-                }
+            //ray.t = ((Dotproduct3D((origin - ray.O), Normal)) / (Dotproduct3D((origin - ray.O), Normal)));
+            ray.t = -1 * (Dotproduct3D(ray.O, Normal) + origin.Length) / Dotproduct3D(ray.D, Normal);
 
-                //als dotproduct = 0, en hij ligt niet op de plane, dan heeft hij geen enkele intersection en moet er een nieuwe worden gereturned.
-                else
-                {
-                    return new Intersection();
-                }
-            }
-            //is de dotproduct niet 0, dan is er dus een intersectie met de plane, hiervoor formule van de slides invullen voor t; t is dan de afstand.
-            else 
+            if (ray.t > 0)
             {
-                //ray.t = ((Dotproduct3D((origin - ray.O), Normal)) / (Dotproduct3D((origin - ray.O), Normal)));
-                ray.t = -1 * (Dotproduct3D(ray.O, Normal) + origin.Length) / Dotproduct3D(ray.D, Normal);
-                if (ray.t < 0)
-                    return new Intersection();
-            }
+                Vector3 i = (ray.O + (ray.t * ray.D)); //dit maakt een vector van ((ray.O.X + ray.t * ray.D.X), (ray.O.Y + ray.t * ray.D.Y), (ray.O.Z + ray.t * ray.D.Z))
+                
 
-            Vector3 i = (ray.O + (ray.t * ray.D)); //dit maakt een vector van ((ray.O.X + ray.t * ray.D.X), (ray.O.Y + ray.t * ray.D.Y), (ray.O.Z + ray.t * ray.D.Z))
-            Vector3 normal = i - origin;
-            normal.Normalize();
-            
-            return new Intersection(this, ray.t, normal, i);
+                return new Intersection(this, ray.t, Normal, i);
+            }
+            else
+                return new Intersection();
         }
     }
 }

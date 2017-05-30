@@ -20,6 +20,7 @@ namespace Template
 
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
+        int recursion = 0;
         // initialize
         public void Init()
         {
@@ -56,6 +57,8 @@ namespace Template
             {
                 for (int x = 0; x < 512; x++)
                 {
+                    if (y == 500)
+                        ;
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
                     
@@ -80,18 +83,23 @@ namespace Template
                 debugraylength = ray.t; 
                 return Vector3.Zero; // Zwart.
             }
-            // TO DO: isMirror bool of float bij Primitives.
-            /*
-            if (I.p.isMirror())
+
+            if (I.p.Mirror)
             {
-                // TO DO: Methode om een ray te reflecteren.
+                if (recursion > 10)
+                {
+                    recursion = 0;
+                    return Vector3.Zero;
+                }
+                recursion++;
+                // Methode om een ray te reflecteren.
                 return Trace(Reflect(ray, I)) * I.p.color;
             }
-            
+            /*
             // Dielectric means glass/any seethrough material, appearently...
             // TO DO: isDielectric bool of float bij Primitives.
             
-            else if (I.p.isDielectric())
+            else if (I.p.DiElectric)
             {
                 // TO DO: Fresnel formule toevoegen. 
                 float f = Fresnel();
@@ -122,19 +130,21 @@ namespace Template
         // TO DO: Dit per lightpoint doen en de waarden meegeven.
         Vector3 DirectIllumination(Intersection I)
         {
-            Vector3 illumination = new Vector3(1,1,1);
+            Vector3 illumination = new Vector3(0, 0, 0);
             foreach (LightSource light in scene.lightsources)
             {
+                // L is shadowray
                 Vector3 L = light.Position - I.i;
                 float distance = L.Length;
-                L *= (1.0f / distance);
-
-                // TO DO: Check of het visible is door middel van shadow rays in de IsVisible methode. 
-                //if (!Light.IsVisible(I, L, distance)) return Vector3.Zero; // Zwart.
-                if (!light.IsVisible(I.i, scene.primitives)) return Vector3.Zero; // Zwart.
-                float attenuation = 1 / (distance * distance);
-                // Dotproduct of the normal of the intersection and L.
-                illumination *= FixColor(light.Color) * attenuation * (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
+                L.Normalize();
+                // check of de lightsource visible is, zo niet, return zwart
+                if (!light.IsVisible(I, scene.primitives)) continue; // Zwart.
+                float attenuation = light.Intensity / (distance * distance);
+                float NdotL = (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
+                if (NdotL < 0) continue;
+                // Dotproduct of the normal of the intersection and shadowray
+                illumination = light.Color * attenuation * NdotL;
+                continue;
             }
 
             return illumination; 
@@ -144,10 +154,6 @@ namespace Template
         // Vind de primitive waarmee de ray intersect. Als er niets wordt gevonden returnt het een lege intersection. 
         Intersection SearchIntersect(Ray ray)
         {
-            foreach (Primitive p in scene.primitives)
-            {
-                p.Intersect(ray); 
-            }
             foreach (Primitive p in scene.primitives)
             {
                 if (p.Intersect(ray).p != null)
@@ -214,6 +220,9 @@ namespace Template
 
         public int FixColor(Vector3 color)
         {
+            if (color.X > 255) color.X = 255;
+            if (color.Y > 255) color.Y = 255;
+            if (color.Z > 255) color.Z = 255;
             return ((int)color.X << 16) + ((int)color.Y << 8) + (int)(color.Z);
         }
     }
