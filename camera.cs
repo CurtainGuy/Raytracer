@@ -10,11 +10,11 @@ namespace Template
     public class Camera
     {
         public Vector3 cameraPosition, cameraDirection;
-        public float distance;
-        Vector3 screenCorner0;
-        Vector3 screenCorner1;
-        Vector3 screenCorner2;
-        Vector3[] screen;
+	public Vector3 screenCorner0;
+        public Vector3 screenCorner1;
+        public Vector3 screenCorner2;
+        public Vector3[] screen;
+        public float screendistance;
         Ray ray;
 
         public Camera(Vector3 position, Vector3 direction, float fov)
@@ -24,12 +24,12 @@ namespace Template
             screen = new Vector3[512 * 512];
 
             float fieldofview = (float)(fov * Math.PI / 360);
-            fieldofview = (float)(1 / (Math.Tan(fieldofview)));
+	screendistance = (float)(1 / (Math.Tan(fieldofview)));
 
             //corners van de camera
-            screenCorner0 = cameraPosition + distance * CameraDirection + new Vector3(-1, -1, 0);
-            screenCorner1 = cameraPosition + distance * CameraDirection + new Vector3(1, -1, 0);
-            screenCorner2 = cameraPosition + distance * CameraDirection + new Vector3(-1, 1, 0);
+            screenCorner0 = cameraPosition + screendistance * CameraDirection + new Vector3(-1, -1, 0);
+            screenCorner1 = cameraPosition + screendistance * CameraDirection + new Vector3(1, -1, 0);
+            screenCorner2 = cameraPosition + screendistance * CameraDirection + new Vector3(-1, 1, 0);
 
             ScreenSetup();
         }
@@ -39,20 +39,21 @@ namespace Template
         // TO DO: Zorg dat het op elke positie werkt.
         void ScreenSetup()
         {
-            // Eerste 1 is de maximale x van de screen, 2e is de minimale x.
-            float multiplierX = (screenCorner0.X - screenCorner2.X) / 512.0000f;
-            float multiplierY = (screenCorner0.Y - screenCorner2.Y) / 512.0000f;
-            float multiplierZ = (screenCorner0.Z - screenCorner2.Z) / 512.0000f;
+            
+            float multiplierx = (screenCorner1.X - screenCorner2.X) / 512.0000f;
+            float multipliery = (screenCorner1.Y - screenCorner2.Y) / 512.0000f;
+            float multiplierz = (screenCorner1.Z - screenCorner2.Z) / 512.0000f;
 
             int i = 0;
             for(float y = 0; y < 512; y++)
             {
                 for(float x = 0; x < 512; x++)
                 {
-                    // De 1tjes bij x en y zijn x1, ofwel minimale x van de screen. 
                     // De 1 bij z * de afstand tussen de camera en het scherm.
                     // Dit berekent de normals tussen de camera en de pixels van het scherm.
-                    screen[i] = new Vector3(multiplierX * x - screenCorner0.X, multiplierY * y - screenCorner0.Y, multiplierY * y - screenCorner0.Z) - cameraPosition;
+
+                    screen[i] = new Vector3(multiplierx * x - screenCorner1.X, multipliery *  y - screenCorner1.Y, 1) - cameraPosition;
+
                     screen[i].Normalize();
                     i++;
                 }
