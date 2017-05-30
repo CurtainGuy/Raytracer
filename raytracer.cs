@@ -47,8 +47,10 @@ namespace Template
         }
 
         float debugraylength;
+        Vector3[] colors;
         public void Render()
         {
+            colors = new Vector3[512 * 512];
             DrawDebug();
             // Dit rendert de hele scene. 
             int i = 0;
@@ -59,14 +61,23 @@ namespace Template
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
                     
-                    Vector3 vector = Trace(ray);
+                    colors[i] = Trace(ray);
                     if (y == 256 && x % 10 == 0)
                         DrawDebugRay(new Ray(ray.O, ray.D, debugraylength));
-                    screen.Plot(x, y, FixColor(vector));
+                    
                     
                     i++;
                 }
                 
+            }
+            i = 0;
+            for (int y = 0; y < 512; y++)
+            {
+                for (int x = 0; x < 512; x++)
+                {
+                    screen.Plot(x, y, FixColor(colors[i]));
+                    i++;
+                }
             }
         }
 
@@ -166,10 +177,12 @@ namespace Template
                 ConverttoDebugX(ray.D.X),
                 ConverttoDebugY(ray.D.Z), FixColor(new Vector3(255, 0, 0)));
 
+
             screen.Line(ConverttoDebugX(ray.D.X),
                 ConverttoDebugY(ray.D.Z),
                 ConverttoDebugX(ray.D.X * ray.t),
                 ConverttoDebugY(ray.D.Z * ray.t), FixColor(new Vector3(255, 255, 0)));
+
         }
 
         void DrawDebug()
