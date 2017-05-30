@@ -20,7 +20,7 @@ namespace Template
 
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
-        int recursion = 0;
+        int maxRecursion = 10;
         // initialize
         public void Init()
         {
@@ -61,7 +61,13 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
+<<<<<<< HEAD
                     
+=======
+                    if (x == 100 && y == 341)
+                        ;
+                    Vector3 vector = Trace(ray, maxRecursion);
+>>>>>>> refs/remotes/origin/master
                     if (y == 256 && x % 10 == 0)
                     {
                         colors[i] = Trace(ray, true);
@@ -90,7 +96,11 @@ namespace Template
 
         // De trace functie van de slides.
         // TO DO: Recursie cappen.
+<<<<<<< HEAD
         Vector3 Trace(Ray ray, bool debug)
+=======
+        Vector3 Trace(Ray ray, int recursion)
+>>>>>>> refs/remotes/origin/master
         {
             Intersection I = SearchIntersect(ray);
             if (I.p == null)
@@ -101,14 +111,16 @@ namespace Template
 
             if (I.p.Mirror)
             {
-                if (recursion > 10)
+                if (recursion < 0)
                 {
-                    recursion = 0;
                     return Vector3.Zero;
                 }
-                recursion++;
                 // Methode om een ray te reflecteren.
+<<<<<<< HEAD
                 return Trace(Reflect(ray, I), debug) * I.p.color;
+=======
+                return Trace(Reflect(ray, I), recursion - 1) * I.p.color;
+>>>>>>> refs/remotes/origin/master
             }
             /*
             // Dielectric means glass/any seethrough material, appearently...
