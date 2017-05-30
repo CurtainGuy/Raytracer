@@ -19,6 +19,7 @@ namespace Template
         public int CameraZ = 500;
 
         Surface pattern;
+        Surface sky;
 
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
@@ -41,6 +42,7 @@ namespace Template
             screenCorner2 = camera.CameraPosition + distance * camera.CameraDirection + new Vector3(-1, 1, 0);
 
             pattern = new Surface("../../assets/pattern.png");
+            sky = new Surface("../../assets/stpeters_probe.png");
             Render();
         }
         // tick: renders one frame
@@ -100,7 +102,7 @@ namespace Template
             if (I.p == null)
             {
                 debugraylength = ray.t; 
-                return Vector3.Zero; // Zwart.
+                return CreateSkyDome(ray); // SkyDome
             }
             Vector3 color = I.p.color;
             if (I.p.Mirror)
@@ -294,6 +296,16 @@ namespace Template
             }
 
             Color col = pattern.bmp.GetPixel(x, y);
+            return new Vector3(col.R, col.G, col.B);
+        }
+
+        public Vector3 CreateSkyDome(Ray ray)
+        {
+            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt((ray.D.X * ray.D.X) + (ray.D.Y * ray.D.Y)));
+            int x = (int)((ray.D.X * r) + 1) * (sky.width / 2);
+            int y = (int)((ray.D.Y * r) + 1) * (sky.height / 2);
+
+            Color col = sky.bmp.GetPixel(x, y);
             return new Vector3(col.R, col.G, col.B);
         }
     }
