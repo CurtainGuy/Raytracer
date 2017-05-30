@@ -76,7 +76,7 @@ namespace Template
         public void CameraTransform(float x, float y, float z)
         {
             //nieuwe camerapositie
-            cameraPosition = cameraPosition + new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
+            cameraPosition = cameraPosition + new Vector3(x / 48, y / 48, z / 48);
             //screenCorner0 += new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
             //screenCorner1 += new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
             //screenCorner2 += new Vector3(0.05f * x, 0.05f * y, 0.05f * z);

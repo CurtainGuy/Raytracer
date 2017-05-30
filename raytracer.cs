@@ -50,10 +50,11 @@ namespace Template
             //camera coordinates
             screen.Print("Cameraposition:" + camera.cameraPosition, 512, 490, 0xffffff);
         }
-
-        float debugraylength;
+        
+        Vector3[] colors;
         public void Render()
         {
+            colors = new Vector3[512 * 512];
             // Dit rendert de hele scene. 
             int i = 0;
             for (int y = 0; y < 512; y++)
@@ -62,27 +63,46 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
-                    if (x == 100 && y == 341)
-                        ;
-                    Vector3 vector = Trace(ray, maxRecursion);
                     if (y == 256 && x % 10 == 0)
-                        DrawDebugRay(new Ray(ray.O, ray.D, debugraylength));
-                    screen.Plot(x, y, FixColor(vector));
-                    
+                    {
+                        colors[i] = Trace(ray, true, maxRecursion);
+                        DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
+                    }
+                    else
+                        colors[i] = Trace(ray, false, maxRecursion);
+
+
                     i++;
                 }
                 
+            }
+            DrawDebug();
+            i = 0;
+            for (int y = 0; y < 512; y++)
+            {
+                for (int x = 0; x < 512; x++)
+                {
+                    screen.Plot(x, y, FixColor(colors[i]));
+                    i++;
+                }
             }
         }
 
         // De trace functie van de slides.
         // TO DO: Recursie cappen.
-        Vector3 Trace(Ray ray, int recursion)
+        Vector3 Trace(Ray ray, bool debug, int recursion)
         {
             Intersection I = SearchIntersect(ray);
             if (I.p == null)
             {
-                debugraylength = ray.t; 
+                if (debug)
+                {
+                    if (recursion == maxRecursion)
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(255, 255, 0));
+                    else
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(0, 255, 0));
+
+                }
                 return Vector3.Zero; // Zwart.
             }
 
@@ -93,7 +113,7 @@ namespace Template
                     return Vector3.Zero;
                 }
                 // Methode om een ray te reflecteren.
-                return Trace(Reflect(ray, I), recursion - 1) * I.p.color;
+                return Trace(Reflect(ray, I), debug, recursion -1) * I.p.color;
             }
             /*
             // Dielectric means glass/any seethrough material, appearently...
@@ -109,8 +129,15 @@ namespace Template
             */
             else
             {
-                debugraylength = I.d;
-                return DirectIllumination(I) * I.p.color;
+                if (debug)
+                {
+                    if (recursion == maxRecursion)
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d - 1), new Vector3(255, 255, 0));
+                    else
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d- 1), new Vector3(0, 255, 0));
+
+                }
+                return DirectIllumination(I, debug) * I.p.color;
             }
 
         }
@@ -134,9 +161,8 @@ namespace Template
             Vector3 refractive = -I.n * angle2;
             return new Ray(I.i, refractive, ray.t);
         }
-
-        // TO DO: Dit per lightpoint doen en de waarden meegeven.
-        Vector3 DirectIllumination(Intersection I)
+        
+        Vector3 DirectIllumination(Intersection I, bool debug)
         {
             Vector3 illumination = new Vector3(0, 0, 0);
             foreach (LightSource light in scene.lightsources)
@@ -145,6 +171,8 @@ namespace Template
                 Vector3 L = light.Position - I.i;
                 float distance = L.Length;
                 L.Normalize();
+                if(debug)
+                    DrawDebugRay(new Ray(I.i, L, distance), new Vector3(200, 200, 200));
                 // check of de lightsource visible is, zo niet, return zwart
                 if (!light.IsVisible(I, scene.primitives)) continue; // Zwart.
                 float attenuation = light.Intensity / (distance * distance);
@@ -173,19 +201,16 @@ namespace Template
             return new Intersection();
         }
 
-        void DrawDebugRay(Ray ray)
+        // Tekent een ray op de debug met de line segmenten.
+        public void DrawDebugRay(Ray ray, Vector3 color )
         {
-            screen.Line(CameraX,
-                    CameraZ,
-                    ConverttoDebugX(ray.D.X * ray.t) - 767 + CameraX,
-                    CameraZ - 500 + ConverttoDebugY(ray.D.Z * ray.t), FixColor(new Vector3(255, 255, 0)));
-
-            screen.Line(CameraX,
-                CameraZ,
-                ConverttoDebugX(ray.D.X) - 767 + CameraX,
-                CameraZ - 500 + ConverttoDebugY(ray.D.Z), FixColor(new Vector3(255, 0, 0)));
+            screen.Line(ConverttoDebugX(ray.O.X),
+                ConverttoDebugY(ray.O.Z),
+                ConverttoDebugX((ray.D.X * ray.t) + ray.O.X),
+                ConverttoDebugY((ray.D.Z * ray.t) + ray.O.Z), FixColor(color));
         }
 
+        // Tekent de primitives, camera en screen.
         void DrawDebug()
         {            
             // Maakt de camera & screen aan in de debugwindow. 
@@ -217,7 +242,7 @@ namespace Template
                 }
             }
         }
-        
+        // Zetten de world-coördinaten om in schermcoördinaten. Gebruikt 767 en 500 
         int ConverttoDebugX(float x)
         {
             return (int)(767 + (x * 48));
