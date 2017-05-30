@@ -24,7 +24,6 @@ namespace Template
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
         int maxRecursion = 10;
-        float debugraylength;
         // initialize
         public void Init()
         {
@@ -111,15 +110,14 @@ namespace Template
             Vector3 color = I.p.color;
             if (I.p.Mirror)
             {
-                if(recursion == 0)
-                    debugraylength = I.d;
                 if (recursion < 0)
                 {
-                    return Trace(Reflect(ray, I), debug, recursion - 1) * color;
+                    return Vector3.Zero;
                 }
-                return new Vector3(1, 1, 1);
                 // Methode om een ray te reflecteren.
+                return Trace(Reflect(ray, I), debug, recursion - 1) * I.p.color;
             }
+                // Methode om een ray te reflecteren.
             else
             {
                 if (I.p is Plane)
