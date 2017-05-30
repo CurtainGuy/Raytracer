@@ -20,14 +20,15 @@ namespace Template
         public Vector3 color;
         public Type type;
         public bool mirror;
-        public bool dielectric;
+        public float absorption, reflection;
 
-        public Primitive(Vector3 o, Vector3 c, bool m = false, bool d = false)
+        public Primitive(Vector3 o, Vector3 c, bool m = false, float ab = 0)
         {
             origin = o;
             color = c;
             mirror = m;
-            dielectric = d;
+            absorption = ab;
+            reflection = 1 - absorption;
         }
 
         // kleine functie voor het berekenen van een dotproduct in 3D.
@@ -52,19 +53,14 @@ namespace Template
         {
             get { return mirror; }
         }
-
-        public bool DiElectric
-        {
-            get { return dielectric; }
-        }
     }
 
     class Sphere : Primitive
     {
         float radius;
 
-        public Sphere(float r, Vector3 o, Vector3 c, bool m = false, bool d = false)
-            : base(o, c, m, d)
+        public Sphere(float r, Vector3 o, Vector3 c, bool m = false, float ab = 0)
+            : base(o, c, m, ab)
         {
             radius = r;
             type = Type.Sphere;
@@ -86,7 +82,7 @@ namespace Template
 
             // Omdat we een intersection willen returnen moeten we nog wat extra waarden vinden.
             Vector3 i = (ray.t * ray.D) + ray.O;    // Punt van de intersection.
-            Vector3 normal = i - origin;            // Normaal van intersection en Sphere.
+            Vector3 normal = 2 * (i - origin);            // Normaal van intersection en Sphere.
             normal.Normalize();
             return new Intersection(this, ray.t, normal, i);
         }
@@ -102,8 +98,8 @@ namespace Template
     {
         Vector3 normal;
         float width, height;
-        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c, bool m = false, bool d = false)
-            : base(o, c, m, d)
+        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c, bool m = false, float ab = 0)
+            : base(o, c, m, ab)
         {
             normal = n;
             width = w;
