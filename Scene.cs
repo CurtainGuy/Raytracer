@@ -32,7 +32,7 @@ namespace Template
             
             
             // Add lightsources
-            lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 1000));
+            lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 100));
         }
     }
 }

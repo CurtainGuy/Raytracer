@@ -86,7 +86,7 @@ namespace Template
 
             // Omdat we een intersection willen returnen moeten we nog wat extra waarden vinden.
             Vector3 i = (ray.t * ray.D) + ray.O;    // Punt van de intersection.
-            Vector3 normal = i - origin;            // Normaal van intersection en Sphere.
+            Vector3 normal = 2 * (i - origin);            // Normaal van intersection en Sphere.
             normal.Normalize();
             return new Intersection(this, ray.t, normal, i);
         }

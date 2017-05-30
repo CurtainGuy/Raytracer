@@ -20,6 +20,7 @@ namespace Template
         // distance from camera to screen (change FOV by changing distance)
         public int distance = 1;
         int maxRecursion = 10;
+        float debugraylength;
         // initialize
         public void Init()
         {
@@ -47,7 +48,6 @@ namespace Template
             screen.Line(2, 20, 160, 20, 0xff0000);
         }
 
-        float debugraylength;
         public void Render()
         {
             DrawDebug();
@@ -84,6 +84,8 @@ namespace Template
             Vector3 color = I.p.color;
             if (I.p.Mirror)
             {
+                if(recursion == 0)
+                    debugraylength = I.d;
                 if (recursion < maxRecursion)
                 {
                     return Trace(Reflect(ray, I), recursion + 1) * color;
@@ -91,21 +93,10 @@ namespace Template
                 return new Vector3(1, 1, 1);
                 // Methode om een ray te reflecteren.
             }
-            /*
-            // Dielectric means glass/any seethrough material, appearently...
-            // TO DO: isDielectric bool of float bij Primitives.
-            
-            else if (I.p.DiElectric)
-            {
-                // TO DO: Fresnel formule toevoegen. 
-                float f = Fresnel();
-                // TO DO: Methode om een ray te refracteren.
-                return (f * Trace(Reflect(ray, I)) + (1 - f) * Trace(Refract(ray, I))) * I.p.color;
-            }
-            */
             else
             {
-                debugraylength = I.d;
+                if(recursion == 0)
+                    debugraylength = I.d;
                 if (I.p is Plane)
                     color = CreatePattern(I.i, pattern);
                 return DirectIllumination(I) * color;
