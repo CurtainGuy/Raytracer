@@ -88,7 +88,8 @@ namespace Template
         // TO DO: Recursie cappen.
         Vector3 Trace(Ray ray, bool debug, int recursion)
         {
-            Intersection I = SearchIntersect(ray);
+            
+        Intersection I = SearchIntersect(ray);
 
             if (I.p == null)
             {
@@ -164,7 +165,7 @@ namespace Template
                 shadowRay.t = shadowRay.D.Length;
                 shadowRay.D.Normalize();
                 if(debug)
-                    DrawDebugRay(new Ray(I.i, shadowRay.D, distance), new Vector3(200, 200, 200));
+                    DrawDebugRay(new Ray(I.i, shadowRay.D, shadowRay.t), new Vector3(200, 200, 200));
                 // check of de lightsource visible is, zo niet, return zwart
                 if (!IsVisible(I, shadowRay)) continue; // Zwart.
 
@@ -190,6 +191,8 @@ namespace Template
                     tMin = t;
             }
 
+            // als de kortste afstand gelijk is aan de lengte van de shadowray, 
+            //dan zitten er geen objecten tussen de lightsource en shadowray
             if (tMin >= shadowRay.t)
                 return true;
             else
@@ -199,19 +202,20 @@ namespace Template
         // Vind de primitive waarmee de ray intersect. Als er niets wordt gevonden returnt het een lege intersection. 
         Intersection SearchIntersect(Ray ray)
         {
-            float tMin = int.MaxValue;
-            Primitive intersected = null;
+            float tMin = int.MaxValue; //begin bij de grootste mogelijke hoeveelheid
+            Primitive intersected = null; // als je nergens mee intersect, dan geef je niks terug
             foreach (Primitive p in scene.primitives)
             {
                 float t = p.Intersect(ray).d;
                 if (t > 0 && t < tMin)
                 {
-                    tMin = t;
-                    intersected = p;
+                    tMin = t; // de afstand tussen lightsource en intersection
+                    intersected = p; // het gevonden object geef je door
                 }
             }
             if (intersected == null)
                 return new Intersection();
+            // return de intersectie die gevonden is
             return new Intersection(intersected, tMin, intersected.Intersect(ray).n, intersected.Intersect(ray).i);
         }
 
