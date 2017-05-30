@@ -57,6 +57,8 @@ namespace Template
             {
                 for (int x = 0; x < 512; x++)
                 {
+                    if (y == 500)
+                        ;
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
                     

@@ -29,7 +29,7 @@ namespace Template
             //primitives.Add(new Plane(new Vector3(1, 0, 0), 0, 0, new Vector3(-.5f, 0, 0), new Vector3(1, 1, 5), true));
 
             // Add lightsources
-            lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 20));
+            lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 15));
         }
     }
 }

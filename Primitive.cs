@@ -133,10 +133,9 @@ namespace Template
             if (ray.t > 0)
             {
                 Vector3 i = (ray.O + (ray.t * ray.D)); //dit maakt een vector van ((ray.O.X + ray.t * ray.D.X), (ray.O.Y + ray.t * ray.D.Y), (ray.O.Z + ray.t * ray.D.Z))
-                Vector3 normal = i - origin;
-                normal.Normalize();
+                
 
-                return new Intersection(this, ray.t, normal, i);
+                return new Intersection(this, ray.t, Normal, i);
             }
             else
                 return new Intersection();
