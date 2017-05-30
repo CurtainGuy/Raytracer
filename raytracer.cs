@@ -115,13 +115,13 @@ namespace Template
                     return Vector3.Zero;
                 }
                 // Methode om een ray te reflecteren.
-                return Trace(Reflect(ray, I), debug, recursion - 1) * color;
+                return (Trace(Reflect(ray, I), debug, recursion - 1) * color);
             }
                 // Methode om een ray te reflecteren.
             else
             {
                 if (I.p is Plane)
-                    color = CreatePattern(I.i);
+                    return (DirectIllumination(I, debug) * CreatePattern(I.i));
                 if (debug)
                 {
                     if (recursion == maxRecursion)
@@ -129,7 +129,7 @@ namespace Template
                     else
                         DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d- 1), new Vector3(0, 255, 0));
                 }
-                return DirectIllumination(I, debug) * color;
+                return (DirectIllumination(I, debug) * color);
             }
 
 
