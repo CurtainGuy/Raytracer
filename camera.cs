@@ -9,7 +9,10 @@ namespace Template
 {
     public class Camera
     {
-        Vector3 cameraPosition, cameraDirection;
+        public Vector3 cameraPosition, cameraDirection;
+        Vector3 screenCorner0;
+        Vector3 screenCorner1;
+        Vector3 screenCorner2;
         Vector3[] screen;
         Ray ray;
 
@@ -18,6 +21,12 @@ namespace Template
             cameraPosition = position;
             cameraDirection = direction;
             screen = new Vector3[512 * 512];
+
+            //corners van de camera
+            int distance = 1;
+            screenCorner0 = cameraPosition + distance * CameraDirection + new Vector3(-1, -1, 0);
+            screenCorner1 = cameraPosition + distance * CameraDirection + new Vector3(1, -1, 0);
+            screenCorner2 = cameraPosition + distance * CameraDirection + new Vector3(-1, 1, 0);
 
             ScreenSetup();
         }
@@ -62,6 +71,15 @@ namespace Template
         {
             get { return cameraDirection; }
             set { cameraDirection = value; }
+        }
+
+        public void CameraTransform(float x, float y, float z)
+        {
+            //nieuwe camerapositie
+            cameraPosition = cameraPosition + new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
+            //screenCorner0 += new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
+            //screenCorner1 += new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
+            //screenCorner2 += new Vector3(0.05f * x, 0.05f * y, 0.05f * z);
         }
     }
 }

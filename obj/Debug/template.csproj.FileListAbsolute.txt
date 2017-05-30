@@ -13,3 +13,10 @@ C:\Users\Gebruiker\Documents\GitHub\Raytracer\bin\Debug\template.exe
 C:\Users\Gebruiker\Documents\GitHub\Raytracer\bin\Debug\template.pdb
 C:\Users\Gebruiker\Documents\GitHub\Raytracer\bin\Debug\OpenTK.dll
 C:\Users\Gebruiker\Documents\GitHub\Raytracer\obj\Debug\Template.csprojResolveAssemblyReference.cache
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\bin\Debug\template.exe.config
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\obj\Debug\template.exe
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\obj\Debug\template.pdb
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\bin\Debug\template.exe
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\bin\Debug\template.pdb
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\bin\Debug\OpenTK.dll
+C:\Users\Joris de Boer\Documents\GitHub\Raytracer\obj\Debug\Template.csprojResolveAssemblyReference.cache
