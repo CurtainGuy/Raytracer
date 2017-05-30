@@ -58,6 +58,14 @@ namespace Template
                 { rayTracer.camera.CameraTransform(0, 1, 0); rayTracer.screen.Clear(0); }
             if(keyboard[Key.KeypadMinus]) //beweeg het scherm naar beneden (Y-as)
                 { rayTracer.camera.CameraTransform(0, -1, 0); rayTracer.screen.Clear(0); }
+            if(keyboard[Key.Q])
+                { rayTracer.camera.rotation(0, -1); }
+            if (keyboard[Key.E])
+            { rayTracer.camera.rotation(0, 1); }
+            if (keyboard[Key.W])
+            { rayTracer.camera.rotation(1, 0); }
+            if (keyboard[Key.S])
+            { rayTracer.camera.rotation(-1, 0); }
             if (keyboard[Key.Enter]) //druk op Enter om het beeld te renderen
             {
                 rayTracer.Render();
