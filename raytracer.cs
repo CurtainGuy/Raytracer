@@ -128,17 +128,21 @@ namespace Template
         // TO DO: Dit per lightpoint doen en de waarden meegeven.
         Vector3 DirectIllumination(Intersection I)
         {
-            Vector3 illumination = new Vector3(1,1,1);
+            Vector3 illumination = new Vector3(0, 0, 0);
             foreach (LightSource light in scene.lightsources)
             {
+                // L is shadowray
                 Vector3 L = light.Position - I.i;
                 float distance = L.Length;
-                L *= (1.0f / distance);
+                L.Normalize();
                 // check of de lightsource visible is, zo niet, return zwart
-                if (!light.IsVisible(I.i, scene.primitives)) return Vector3.Zero; // Zwart.
-                float attenuation = 1 / (distance * distance);
-                // Dotproduct of the normal of the intersection and L.
-                illumination *= FixColor(light.Color) * attenuation * ((I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z)) * light.Intensity;
+                if (!light.IsVisible(I.i, scene.primitives)) continue; // Zwart.
+                float attenuation = light.Intensity / (distance * distance);
+                float NdotL = (I.n.X * L.X) + (I.n.Y * L.Y) + (I.n.Z * L.Z);
+                if (NdotL < 0) continue;
+                // Dotproduct of the normal of the intersection and shadowray
+                illumination = light.Color * attenuation * NdotL;
+                continue;
             }
 
             return illumination; 
@@ -218,6 +222,9 @@ namespace Template
 
         public int FixColor(Vector3 color)
         {
+            if (color.X > 255) color.X = 255;
+            if (color.Y > 255) color.Y = 255;
+            if (color.Z > 255) color.Z = 255;
             return ((int)color.X << 16) + ((int)color.Y << 8) + (int)(color.Z);
         }
     }
