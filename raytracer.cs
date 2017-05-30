@@ -21,15 +21,15 @@ namespace Template
         public int CameraX = 767;
         public int CameraZ = 500;
 
-        // distance from camera to screen (change FOV by changing distance)
-        public int distance = 1;
+        // distance from camera to screen (change FOV by changing distance) -- DIT KLOPT VOLGENS MIJ NIET, ER GEBEURT NAMELIJK NIKS MET JE FOV
+        public float distance = 1f;
         int maxRecursion = 10;
         // initialize
         public void Init()
         {
 
             // the camera from where you see the scene
-            camera = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1));
+            camera = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), 90);
             
             scene = new Scene(camera.CameraPosition);
 
@@ -48,7 +48,7 @@ namespace Template
             DrawDebug();
             
             //camera coordinates
-            screen.Print("Cameraposition:" + camera.cameraPosition, 512, 490, 0xffffff);
+            screen.Print("Cameraposition: " + camera.cameraPosition, 512, 490, 0xffffff);
         }
         
         Vector3[] colors;
