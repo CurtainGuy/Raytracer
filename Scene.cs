@@ -30,7 +30,6 @@ namespace Template
             
             //primitives.Add(new Plane(new Vector3(1, 0, 0), 0, 0, new Vector3(-1f, 0, 0), new Vector3(1, 1, 1), true));
             
-            
             // Add lightsources
             lightsources.Add(new LightSource(new Vector3(0, 5, 0), new Vector3(1, 1, 1), 100));
         }

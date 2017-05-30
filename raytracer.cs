@@ -12,8 +12,11 @@ namespace Template
         public Surface screen;
         public Vector3 screenCorner0, screenCorner1, screenCorner2;
         
-        Camera camera;
-        Scene scene;
+        public Camera camera;
+        public Scene scene;
+
+        public int CameraX = 767;
+        public int CameraZ = 500;
 
         Surface pattern;
 
@@ -40,17 +43,19 @@ namespace Template
             pattern = new Surface("../../assets/pattern.png");
             Render();
         }
-        // tick: renders one frame (isn't being used)
+        // tick: renders one frame
         public void Tick()
         {
-            screen.Clear(0);
-            screen.Print("hello world", 2, 2, 0xffffff);
-            screen.Line(2, 20, 160, 20, 0xff0000);
+            DrawDebug();
+            
+            //camera coordinates
+            screen.Print("Cameraposition:" + camera.cameraPosition, 512, 490, 0xffffff);
         }
 
+        Vector3[] colors;
         public void Render()
         {
-            DrawDebug();
+            colors = new Vector3[512 * 512];
             // Dit rendert de hele scene. 
             int i = 0;
             for (int y = 0; y < 512; y++)
@@ -61,18 +66,34 @@ namespace Template
                     Ray ray = camera.SendRay(i);
                     Vector3 vector = Trace(ray, 0);
                     if (y == 256 && x % 10 == 0)
-                        DrawDebugRay(new Ray(ray.O, ray.D, debugraylength));
-                    screen.Plot(x, y, FixColor(vector));
-                    
+                    {
+                        colors[i] = Trace(ray, true, maxRecursion);
+                        DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, debugraylength - 1), new Vector3(255, 255, 0));
+                    }
+                    else
+                        colors[i] = Trace(ray, false, maxRecursion);
+
+
                     i++;
                 }
                 
+            }
+            DrawDebug();
+            i = 0;
+            for (int y = 0; y < 512; y++)
+            {
+                for (int x = 0; x < 512; x++)
+                {
+                    screen.Plot(x, y, FixColor(colors[i]));
+                    i++;
+                }
             }
         }
 
         // De trace functie van de slides.
         // TO DO: Recursie cappen.
-        Vector3 Trace(Ray ray, int recursion)
+        Vector3 Trace(Ray ray, bool debug, int recursion)
         {
             Intersection I = SearchIntersect(ray);
 
@@ -100,6 +121,8 @@ namespace Template
                 if (I.p is Plane)
                     color = CreatePattern(I.i, pattern);
                 return DirectIllumination(I) * color;
+                debugraylength = I.d;
+                return DirectIllumination(I, debug) * I.p.color;
             }
 
 
@@ -113,13 +136,22 @@ namespace Template
             return seccondaryRay;
         }
 
-        public Ray Refract(Ray ray, Intersection I)
+        public Ray Refract(Ray ray, Intersection I, float N1, float N2)
         {
-            return new Ray();
+            float angle1 = (((I.n.X * ray.D.X) + (I.n.Y * ray.D.Y) + (I.n.Z * ray.D.Z)) / (I.n.Length * ray.D.Length));
+
+            //N = 1;       brekingsindex van lucht
+            //N= (3 / 2); brekingsindex van glass
+            //N = (4 / 3); brekingsindex van water
+
+            float angle2 = (float)Math.Asin((N1 / N2) * Math.Sin(angle1));
+
+            Vector3 refractive = -I.n * angle2;
+            return new Ray(I.i, refractive, ray.t);
         }
 
         // TO DO: Dit per lightpoint doen en de waarden meegeven.
-        Vector3 DirectIllumination(Intersection I)
+        Vector3 DirectIllumination(Intersection I, bool debug)
         {
             Vector3 illumination = new Vector3(0, 0, 0);
             Ray shadowRay = new Ray();
@@ -130,7 +162,8 @@ namespace Template
                 shadowRay.O = I.i;
                 shadowRay.t = shadowRay.D.Length;
                 shadowRay.D.Normalize();
-
+                if(debug)
+                    DrawDebugRay(new Ray(I.i, L, distance), new Vector3(200, 200, 200));
                 // check of de lightsource visible is, zo niet, return zwart
                 if (!IsVisible(I, shadowRay)) continue; // Zwart.
 
@@ -176,25 +209,20 @@ namespace Template
             return new Intersection();
         }
 
-        void DrawDebugRay(Ray ray)
+        public void DrawDebugRay(Ray ray, Vector3 color )
         {
-            screen.Line(ConverttoDebugX(camera.CameraPosition.X),
-                ConverttoDebugY(camera.CameraPosition.Z),
-                ConverttoDebugX(ray.D.X),
-                ConverttoDebugY(ray.D.Z), FixColor(new Vector3(255, 0, 0)));
-
-            screen.Line(ConverttoDebugX(ray.D.X),
-                ConverttoDebugY(ray.D.Z),
-                ConverttoDebugX(ray.D.X * ray.t),
-                ConverttoDebugY(ray.D.Z * ray.t), FixColor(new Vector3(255, 255, 0)));
+            screen.Line(ConverttoDebugX(ray.O.X),
+                ConverttoDebugY(ray.O.Z),
+                ConverttoDebugX((ray.D.X * ray.t) + ray.O.X),
+                ConverttoDebugY((ray.D.Z * ray.t) + ray.O.Z), FixColor(color));
         }
 
         void DrawDebug()
-        {
+        {            
             // Maakt de camera & screen aan in de debugwindow. 
-            screen.Plot(767, 500, FixColor(new Vector3(255,255,255)));
-            screen.Line(ConverttoDebugX(screenCorner0.X), ConverttoDebugY(screenCorner0.Z), 
-                ConverttoDebugX(screenCorner1.X), ConverttoDebugY(screenCorner1.Z), FixColor(new Vector3(255, 255, 255)));
+            screen.Plot(CameraX, CameraZ, FixColor(new Vector3(255,255,255)));
+            screen.Line(CameraX + (int)(screenCorner0.X)*48, CameraZ - (int)(screenCorner0.Z)*48,
+                CameraX + (int)(screenCorner1.X)*48, CameraZ - (int)(screenCorner1.Z)*48, FixColor(new Vector3(255, 255, 255)));
 
             List<Sphere> spheres = new List<Sphere>();
             foreach(Primitive p in scene.primitives)
@@ -206,15 +234,17 @@ namespace Template
             foreach (Sphere s in spheres)
             {
                 
-                float newradius = (float)Math.Sqrt((s.Radius * s.Radius) - (s.Origin.Y * s.origin.Y));
-                
-                for(int a = 0; a < 100; a++)
+                float newradius = (float)Math.Sqrt((s.Radius * s.Radius) - (s.Origin.Y * s.origin.Y) - (camera.cameraPosition.Y * camera.cameraPosition.Y));
+                if(newradius > 0)
                 {
-                    // Draws a linepiece between two circlepoints.
-                    screen.Line(ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos(a * angle))), 
-                        ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin(a * angle))),
-                        ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos((a + 1) * angle))), 
-                        ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin((a + 1) * angle))), FixColor(s.color));
+                    for (int a = 0; a < 100; a++)
+                    {
+                        // Draws a linepiece between two circlepoints.
+                        screen.Line(ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos(a * angle))),
+                            ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin(a * angle))),
+                            ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos((a + 1) * angle))),
+                            ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin((a + 1) * angle))), FixColor(s.color));
+                    }
                 }
             }
         }
