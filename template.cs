@@ -46,11 +46,27 @@ namespace Template
 			// called once per frame; app logic
 			var keyboard = OpenTK.Input.Keyboard.GetState();
 			if (keyboard[OpenTK.Input.Key.Escape]) this.Exit();
+            if (keyboard[Key.Left]) //beweeg het scherm naar links
+                { rayTracer.CameraX -= 1; rayTracer.camera.CameraTransform(-0.5f, 0, 0); rayTracer.screen.Clear(0); }
+            if(keyboard[Key.Right]) //beweeg het scherm naar rechts
+                { rayTracer.CameraX += 1; rayTracer.camera.CameraTransform(0.5f, 0, 0); rayTracer.screen.Clear(0); }
+            if(keyboard[Key.Up]) //beweeg het scherm naar boven (Z- as)
+                { rayTracer.CameraZ -= 1; rayTracer.camera.CameraTransform(0, 0, 0.5f); rayTracer.screen.Clear(0); }
+            if(keyboard[Key.Down]) //beweeg het scherm naar beneden (Z- as)
+                { rayTracer.CameraZ += 1; rayTracer.camera.CameraTransform(0, 0, -0.5f); rayTracer.screen.Clear(0); }
+            if(keyboard[Key.KeypadPlus]) //beweeg het scherm naar boven (Y-as)
+                { rayTracer.camera.CameraTransform(0, 0.5f, 0); rayTracer.screen.Clear(0); }
+            if(keyboard[Key.KeypadMinus]) //beweeg het scherm naar beneden (Y-as)
+                { rayTracer.camera.CameraTransform(0, -0.5f, 0); rayTracer.screen.Clear(0); }
+            if (keyboard[Key.Enter]) //druk op Enter om het beeld te renderen
+            {
+                rayTracer.Render();
+            }
 		}
 		protected override void OnRenderFrame( FrameEventArgs e )
 		{
 			// called once per frame; render
-			//rayTracer.Tick();
+		    rayTracer.Tick();
 			if (terminated) 
 			{
 				Exit();
@@ -80,6 +96,7 @@ namespace Template
 			// tell OpenTK we're done rendering
 			SwapBuffers();
 		}
+
 		public static void Main( string[] args ) 
 		{ 
 			// entry point
