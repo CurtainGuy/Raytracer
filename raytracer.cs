@@ -65,7 +65,6 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
-                    Vector3 vector = Trace(ray, 0);
                     if (y == 256 && x % 10 == 0)
                     {
                         colors[i] = Trace(ray, true, maxRecursion);
@@ -114,9 +113,9 @@ namespace Template
             {
                 if(recursion == 0)
                     debugraylength = I.d;
-                if (recursion < maxRecursion)
+                if (recursion < 0)
                 {
-                    return Trace(Reflect(ray, I), recursion + 1) * color;
+                    return Trace(Reflect(ray, I), debug, recursion - 1) * color;
                 }
                 return new Vector3(1, 1, 1);
                 // Methode om een ray te reflecteren.
@@ -172,7 +171,7 @@ namespace Template
                 shadowRay.t = shadowRay.D.Length;
                 shadowRay.D.Normalize();
                 if(debug)
-                    DrawDebugRay(new Ray(I.i, L, distance), new Vector3(200, 200, 200));
+                    DrawDebugRay(new Ray(I.i, shadowRay.D, distance), new Vector3(200, 200, 200));
                 // check of de lightsource visible is, zo niet, return zwart
                 if (!IsVisible(I, shadowRay)) continue; // Zwart.
 
