@@ -115,13 +115,13 @@ namespace Template
                     return Vector3.Zero;
                 }
                 // Methode om een ray te reflecteren.
-                return Trace(Reflect(ray, I), debug, recursion - 1) * I.p.color;
+                return Trace(Reflect(ray, I), debug, recursion - 1) * color;
             }
                 // Methode om een ray te reflecteren.
             else
             {
                 if (I.p is Plane)
-                    color = CreatePattern(I.i, pattern);
+                    color = CreatePattern(I.i);
                 if (debug)
                 {
                     if (recursion == maxRecursion)
@@ -129,7 +129,7 @@ namespace Template
                     else
                         DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d- 1), new Vector3(0, 255, 0));
                 }
-                return DirectIllumination(I, debug) * I.p.color;
+                return DirectIllumination(I, debug) * color;
             }
 
 
@@ -145,7 +145,7 @@ namespace Template
 
         public Ray Refract(Ray ray, Intersection I, float N1, float N2)
         {
-            float angle1 = (((I.n.X * ray.D.X) + (I.n.Y * ray.D.Y) + (I.n.Z * ray.D.Z)) / (I.n.Length * ray.D.Length));
+            float angle1 = Vector3.Dot(I.n, ray.D) / (I.n.Length * ray.D.Length);
 
             //N = 1;       brekingsindex van lucht
             //N= (3 / 2); brekingsindex van glass
@@ -204,15 +204,20 @@ namespace Template
         // Vind de primitive waarmee de ray intersect. Als er niets wordt gevonden returnt het een lege intersection. 
         Intersection SearchIntersect(Ray ray)
         {
+            float tMin = int.MaxValue;
+            Primitive intersected = null;
             foreach (Primitive p in scene.primitives)
             {
-                if (p.Intersect(ray).p != null)
+                float t = p.Intersect(ray).d;
+                if (t > 0 && t < tMin)
                 {
-                    return p.Intersect(ray);
+                    tMin = t;
+                    intersected = p;
                 }
             }
-
-            return new Intersection();
+            if (intersected == null)
+                return new Intersection();
+            return new Intersection(intersected, tMin, intersected.Intersect(ray).n, intersected.Intersect(ray).i);
         }
 
         // Tekent een ray op de debug met de line segmenten.
@@ -275,30 +280,30 @@ namespace Template
             return ((int)color.X << 16) + ((int)color.Y << 8) + (int)(color.Z);
         }
 
-        public Vector3 CreatePattern(Vector3 P, Surface T)
+        public Vector3 CreatePattern(Vector3 P)
         {
             Vector2 point = new Vector2(P.X, P.Z);
-            int x = (int)Math.Round(point.X * T.width - 0.5);
+            int x = (int)Math.Round(point.X * pattern.width - 0.5);
 
             //keep x within the range of the surface, as the plane is infinite
             while (x < 0)
             {
-                x += T.width;
+                x += pattern.width;
             }
-            while (x >= T.width)
+            while (x >= pattern.width)
             {
-                x -= T.width;
+                x -= pattern.width;
             }
 
-            int y = (int)Math.Round(point.Y * T.height - 0.5);
+            int y = (int)Math.Round(point.Y * pattern.height - 0.5);
             //keep y within the range of the surface, as the plane is infinite
             while (y < 0)
             {
-                y += T.height;
+                y += pattern.height;
             }
-            while (y >= T.height)
+            while (y >= pattern.height)
             {
-                y -= T.height;
+                y -= pattern.height;
             }
 
             Color col = pattern.bmp.GetPixel(x, y);
@@ -307,11 +312,11 @@ namespace Template
 
         public Vector3 CreateSkyDome(Ray ray)
         {
-            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt((ray.D.X * ray.D.X) + (ray.D.Y * ray.D.Y)));
-            int x = (int)((ray.D.X * r) + 1) * (sky.width / 2);
-            int y = (int)((ray.D.Y * r) + 1) * (sky.height / 2);
-
-            Color col = sky.bmp.GetPixel(x, y);
+            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y + 1));
+            //Console.WriteLine(r);
+            float x = MathHelper.Clamp(((ray.D.X * r + 1) * sky.width / 2), 0, sky.width - 1);
+            float y = MathHelper.Clamp(((ray.D.Y * r + 1) * sky.height / 2), 0, sky.height - 1);
+            Color col = sky.bmp.GetPixel((int)x, (int)y);
             return new Vector3(col.R, col.G, col.B);
         }
     }
