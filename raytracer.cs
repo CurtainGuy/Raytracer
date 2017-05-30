@@ -53,7 +53,6 @@ namespace Template
             //camera coordinates
             screen.Print("Cameraposition:" + camera.cameraPosition, 512, 490, 0xffffff);
         }
-
         Vector3[] colors;
         public void Render()
         {
@@ -71,7 +70,6 @@ namespace Template
                     {
                         colors[i] = Trace(ray, true, maxRecursion);
                         DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
-                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, debugraylength - 1), new Vector3(255, 255, 0));
                     }
                     else
                         colors[i] = Trace(ray, false, maxRecursion);
@@ -101,7 +99,14 @@ namespace Template
 
             if (I.p == null)
             {
-                debugraylength = ray.t; 
+                if (debug)
+                {
+                    if (recursion == maxRecursion)
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(255, 255, 0));
+                    else
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(0, 255, 0));
+
+                }
                 return CreateSkyDome(ray); // SkyDome
             }
             Vector3 color = I.p.color;
@@ -118,12 +123,15 @@ namespace Template
             }
             else
             {
-                if(recursion == 0)
-                    debugraylength = I.d;
                 if (I.p is Plane)
                     color = CreatePattern(I.i, pattern);
-                return DirectIllumination(I) * color;
-                debugraylength = I.d;
+                if (debug)
+                {
+                    if (recursion == maxRecursion)
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d - 1), new Vector3(255, 255, 0));
+                    else
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d- 1), new Vector3(0, 255, 0));
+                }
                 return DirectIllumination(I, debug) * I.p.color;
             }
 
@@ -151,8 +159,7 @@ namespace Template
             Vector3 refractive = -I.n * angle2;
             return new Ray(I.i, refractive, ray.t);
         }
-
-        // TO DO: Dit per lightpoint doen en de waarden meegeven.
+        
         Vector3 DirectIllumination(Intersection I, bool debug)
         {
             Vector3 illumination = new Vector3(0, 0, 0);
@@ -211,6 +218,7 @@ namespace Template
             return new Intersection();
         }
 
+        // Tekent een ray op de debug met de line segmenten.
         public void DrawDebugRay(Ray ray, Vector3 color )
         {
             screen.Line(ConverttoDebugX(ray.O.X),
@@ -219,6 +227,7 @@ namespace Template
                 ConverttoDebugY((ray.D.Z * ray.t) + ray.O.Z), FixColor(color));
         }
 
+        // Tekent de primitives, camera en screen.
         void DrawDebug()
         {            
             // Maakt de camera & screen aan in de debugwindow. 
@@ -250,7 +259,7 @@ namespace Template
                 }
             }
         }
-        
+        // Zetten de world-coördinaten om in schermcoördinaten. Gebruikt 767 en 500 
         int ConverttoDebugX(float x)
         {
             return (int)(767 + (x * 48));
