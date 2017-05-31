@@ -9,12 +9,8 @@ namespace Template
 {
     public class LightSource
     {
-<<<<<<< HEAD
         // In lightsource gebeurd vrij weinig. Dit bevat alleen informatie en had achteraf waarschijnlijk een struct kunnen zijn.
         // We're in too deep now...
-=======
-        // positie, kleur en intensiteit van de lightsource
->>>>>>> refs/remotes/origin/master
         Vector3 position;
         Vector3 color;
         float intensity;
