@@ -9,7 +9,7 @@ namespace Template
 {
     public class LightSource
     {
-        // Note: onzeker of Vector3 of float3 moet worden gebruikt. 
+        // positie, kleur en intensiteit van de lightsource
         Vector3 position;
         Vector3 color;
         float intensity;

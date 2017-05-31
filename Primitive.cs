@@ -81,7 +81,7 @@ namespace Template
             if ((t < ray.t) && (t > 0)) ray.t = t;
 
             // Omdat we een intersection willen returnen moeten we nog wat extra waarden vinden.
-            Vector3 i = (ray.t * ray.D) + ray.O;    // Punt van de intersection.
+            Vector3 i = (ray.t * ray.D) + ray.O;          // Punt van de intersection.
             Vector3 normal = 2 * (i - origin);            // Normaal van intersection en Sphere.
             normal.Normalize();
             return new Intersection(this, ray.t, normal, i);
@@ -92,18 +92,14 @@ namespace Template
             get { return radius; }
         }
     }
-
-    // Onzeker of de width en height nodig zijn hiervoor. 
+    
     class Plane : Primitive
     {
         Vector3 normal;
-        float width, height;
-        public Plane(Vector3 n, float w, float h, Vector3 o, Vector3 c, bool m = false, float ab = 0)
+        public Plane(Vector3 n, Vector3 o, Vector3 c, bool m = false, float ab = 0)
             : base(o, c, m, ab)
         {
             normal = n;
-            width = w;
-            height = h;
             type = Type.Plane;
         }
 
@@ -112,18 +108,8 @@ namespace Template
             get { return normal; }
         }
 
-        public float Width
-        {
-            get { return width; }
-        }
-        public float Height
-        {
-            get { return height; }
-        }
-
         public override Intersection Intersect(Ray ray)
         {
-            //ray.t = ((Dotproduct3D((origin - ray.O), Normal)) / (Dotproduct3D((origin - ray.O), Normal)));
             ray.t = -1 * (Dotproduct3D(ray.O, Normal) + origin.Length) / Dotproduct3D(ray.D, Normal);
 
             if (ray.t > 0)

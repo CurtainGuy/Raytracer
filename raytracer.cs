@@ -120,9 +120,10 @@ namespace Template
                     return Vector3.Zero;
                 }
                 // Methode om een ray te reflecteren.
+                // de kleur van de gereflecteerde ray vermenigvuldigd met hoe sterk de reflectie is
+                // de kleur van het object wordt vermenigvuldigd met hoe sterk de absorptie is
                 return ((Trace(Reflect(ray, I), debug, recursion - 1) * color * I.p.reflection) + (DirectIllumination(I, debug) * I.p.absorption));
             }
-                // Methode om een ray te reflecteren.
             else
             {
                 if (I.p is Plane)
@@ -298,7 +299,7 @@ namespace Template
             Vector2 point = new Vector2(P.X, P.Z);
             int x = (int)Math.Round(point.X * pattern.width - 0.5);
 
-            //keep x within the range of the surface, as the plane is infinite
+            // zorg er voor dat x binnen het bereik van de afbeelding blijft, aangezien de plane oneindig lang is
             while (x < 0)
             {
                 x += pattern.width;
@@ -309,7 +310,7 @@ namespace Template
             }
 
             int y = (int)Math.Round(point.Y * pattern.height - 0.5);
-            //keep y within the range of the surface, as the plane is infinite
+            // zorg er voor dat y binnen het bereik van de afbeelding blijft, aangezien de plane oneindig lang is
             while (y < 0)
             {
                 y += pattern.height;
@@ -319,16 +320,20 @@ namespace Template
                 y -= pattern.height;
             }
 
+            // geef de kleur van de afbeelding op het berekende punt terug
             Color col = pattern.bmp.GetPixel(x, y);
             return new Vector3(col.R, col.G, col.B);
         }
 
         public Vector3 CreateSkyDome(Ray ray)
         {
+            //formule van de gegeven site
             float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y + 0.01f));
-            //Console.WriteLine(r);
+            // schaal x naar de grootte van de afbeelding
             float x = MathHelper.Clamp(((ray.D.X * r + 1) * sky.width / 2), 0, sky.width - 1);
+            // schaal y naar de grootte van de afbeelding
             float y = MathHelper.Clamp(((ray.D.Y * r + 1) * sky.height / 2), 0, sky.height - 1);
+            // geef de kleur van de afbeelding op het berekende punt terug
             Color col = sky.bmp.GetPixel((int)x, (int)y);
             return new Vector3(col.R, col.G, col.B);
         }
