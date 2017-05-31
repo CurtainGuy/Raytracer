@@ -111,13 +111,13 @@ namespace Template
                     return Vector3.Zero;
                 }
                 // Methode om een ray te reflecteren.
-                return (Trace(Reflect(ray, I), debug, recursion - 1) * color);
+                return ((Trace(Reflect(ray, I), debug, recursion - 1) * color * I.p.reflection) + (DirectIllumination(I, debug) * I.p.absorption));
             }
                 // Methode om een ray te reflecteren.
             else
             {
                 if (I.p is Plane)
-                    return (DirectIllumination(I, debug) * CreatePattern(I.i));
+                    color = CreatePattern(I.i);
                 if (debug)
                 {
                     if (recursion == maxRecursion)
@@ -136,6 +136,7 @@ namespace Template
             Ray seccondaryRay = new Ray();
             seccondaryRay.D = ray.D - ((2 * I.n) * (Vector3.Dot(ray.D, I.n)));
             seccondaryRay.O = I.i;
+            seccondaryRay.t = float.MaxValue;
             return seccondaryRay;
         }
 
@@ -311,7 +312,7 @@ namespace Template
 
         public Vector3 CreateSkyDome(Ray ray)
         {
-            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y + 1));
+            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y + 0.01f));
             //Console.WriteLine(r);
             float x = MathHelper.Clamp(((ray.D.X * r + 1) * sky.width / 2), 0, sky.width - 1);
             float y = MathHelper.Clamp(((ray.D.Y * r + 1) * sky.height / 2), 0, sky.height - 1);
