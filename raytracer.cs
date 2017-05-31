@@ -59,7 +59,7 @@ namespace Template
                 {
                     // De rays zijn opgeslagen in een array in camera. 
                     Ray ray = camera.SendRay(i);
-                    if (y == 256 && x % 10 == 0)
+                    if (y == 256 && x % 20 == 0)
                     {
                         colors[i] = Trace(ray, true, maxRecursion);
                         DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
@@ -97,7 +97,7 @@ namespace Template
                     if (recursion == maxRecursion)
                         DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(255, 255, 0));
                     else
-                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(0, 255, 0));
+                        DrawDebugRay(ray, new Vector3(0, 255, 0));
 
                 }
                 return CreateSkyDome(ray); // SkyDome
@@ -105,6 +105,15 @@ namespace Template
             Vector3 color = I.p.color;
             if (I.p.Mirror)
             {
+                
+
+                if (debug)
+                {
+                    if (recursion == maxRecursion)
+                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d - 1), new Vector3(255, 255, 0));
+                    else
+                        DrawDebugRay(new Ray(ray.O, ray.D, I.d), new Vector3(0, 255, 0));
+                }
                 if (recursion < 0)
                 {
                     return Vector3.Zero;
@@ -115,19 +124,18 @@ namespace Template
                 // Methode om een ray te reflecteren.
             else
             {
-                if (I.p is Plane)
-                    return (DirectIllumination(I, debug) * CreatePattern(I.i));
                 if (debug)
                 {
                     if (recursion == maxRecursion)
                         DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d - 1), new Vector3(255, 255, 0));
                     else
-                        DrawDebugRay(new Ray(ray.D + ray.O, ray.D, I.d- 1), new Vector3(0, 255, 0));
+                        DrawDebugRay(new Ray(ray.O, ray.D, I.d), new Vector3(0, 255, 0));
                 }
+                if (I.p is Plane)
+                    return (DirectIllumination(I, debug) * CreatePattern(I.i));
+                
                 return (DirectIllumination(I, debug) * color);
             }
-
-
         }
 
         public Ray Reflect(Ray ray, Intersection I)
@@ -135,6 +143,7 @@ namespace Template
             Ray seccondaryRay = new Ray();
             seccondaryRay.D = ray.D - ((2 * I.n) * (Vector3.Dot(ray.D, I.n)));
             seccondaryRay.O = I.i;
+            seccondaryRay.t = int.MaxValue;
             return seccondaryRay;
         }
 
@@ -164,7 +173,7 @@ namespace Template
                 shadowRay.t = shadowRay.D.Length;
                 shadowRay.D.Normalize();
                 if(debug)
-                    DrawDebugRay(new Ray(I.i, shadowRay.D, distance), new Vector3(200, 200, 200));
+                    DrawDebugRay(new Ray(I.i, shadowRay.D, shadowRay.t), new Vector3(200, 200, 200));
                 // check of de lightsource visible is, zo niet, return zwart
                 if (!IsVisible(I, shadowRay)) continue; // Zwart.
 
@@ -229,8 +238,8 @@ namespace Template
         {            
             // Maakt de camera & screen aan in de debugwindow. 
             screen.Plot(CameraX, CameraZ, FixColor(new Vector3(255,255,255)));
-            screen.Line(CameraX + (int)(camera.screenCorner0.X)*48, CameraZ - (int)(camera.screenCorner0.Z)*48,
-                CameraX + (int)(camera.screenCorner1.X)*48, CameraZ - (int)(camera.screenCorner1.Z)*48, FixColor(new Vector3(255, 255, 255)));
+            screen.Line(CameraX + (int)(camera.screenCorner0.X)*48, CameraZ - 48 - (int)(camera.screenCorner0.Z)*48,
+                CameraX + (int)(camera.screenCorner1.X)*48, CameraZ - 48 - (int)(camera.screenCorner1.Z)*48, FixColor(new Vector3(255, 255, 255)));
 
             List<Sphere> spheres = new List<Sphere>();
             foreach(Primitive p in scene.primitives)
@@ -241,8 +250,11 @@ namespace Template
             float angle = 2 * (float)Math.PI / 100;
             foreach (Sphere s in spheres)
             {
-                
-                float newradius = (float)Math.Sqrt((s.Radius * s.Radius) - (s.Origin.Y * s.origin.Y) - (camera.cameraPosition.Y * camera.cameraPosition.Y));
+                Vector3 c = s.color;
+                if (s.Mirror)
+                    c = new Vector3(240,255,255);
+
+                float newradius = (float)Math.Sqrt((s.Radius * s.Radius) - ((s.Origin.Y - camera.cameraPosition.Y) * (s.Origin.Y - camera.cameraPosition.Y)));
                 if(newradius > 0)
                 {
                     for (int a = 0; a < 100; a++)
@@ -251,7 +263,7 @@ namespace Template
                         screen.Line(ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos(a * angle))),
                             ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin(a * angle))),
                             ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos((a + 1) * angle))),
-                            ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin((a + 1) * angle))), FixColor(s.color));
+                            ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin((a + 1) * angle))), FixColor(c));
                     }
                 }
             }
