@@ -158,12 +158,23 @@ namespace Template
                 }
 
                 // Methode om een ray te reflecteren.
+<<<<<<< HEAD
                 return (Trace(Reflect(ray, I), debug, recursion - 1) * I.p.color);
             }
             // Voor alle andere intersections...
             else
             {
                 // Tekent hij voor debugrays ook de rays in de debugwindow.
+=======
+                // de kleur van de gereflecteerde ray vermenigvuldigd met hoe sterk de reflectie is
+                // de kleur van het object wordt vermenigvuldigd met hoe sterk de absorptie is
+                return ((Trace(Reflect(ray, I), debug, recursion - 1) * color * I.p.reflection) + (DirectIllumination(I, debug) * I.p.absorption));
+            }
+            else
+            {
+                if (I.p is Plane)
+                    color = CreatePattern(I.i);
+>>>>>>> refs/remotes/origin/master
                 if (debug)
                 {
                     if (recursion == maxRecursion)
@@ -353,8 +364,13 @@ namespace Template
         {
             Vector2 point = new Vector2(P.X, P.Z);
             int x = (int)Math.Round(point.X * pattern.width - 0.5);
+<<<<<<< HEAD
             
             // Omdat een plane oneindig is moet x binnen de range zitten.
+=======
+
+            // zorg er voor dat x binnen het bereik van de afbeelding blijft, aangezien de plane oneindig lang is
+>>>>>>> refs/remotes/origin/master
             while (x < 0)
             {
                 x += pattern.width;
@@ -365,7 +381,11 @@ namespace Template
             }
 
             int y = (int)Math.Round(point.Y * pattern.height - 0.5);
+<<<<<<< HEAD
             // Omdat een plane oneindig is moet ook de y binnen de range zitten.
+=======
+            // zorg er voor dat y binnen het bereik van de afbeelding blijft, aangezien de plane oneindig lang is
+>>>>>>> refs/remotes/origin/master
             while (y < 0)
             {
                 y += pattern.height;
@@ -375,6 +395,7 @@ namespace Template
                 y -= pattern.height;
             }
 
+            // geef de kleur van de afbeelding op het berekende punt terug
             Color col = pattern.bmp.GetPixel(x, y);
             return new Vector3(col.R, col.G, col.B);
         }
@@ -382,9 +403,17 @@ namespace Template
         // Kijkt waar een ray intersect met de skydome. Return de kleur.
         public Vector3 CreateSkyDome(Ray ray)
         {
+<<<<<<< HEAD
             float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y + 1));
+=======
+            //formule van de gegeven site
+            float r = (float)((1 / Math.PI) * Math.Acos(ray.D.Z) / Math.Sqrt(ray.D.X * ray.D.X + ray.D.Y * ray.D.Y + 0.01f));
+            // schaal x naar de grootte van de afbeelding
+>>>>>>> refs/remotes/origin/master
             float x = MathHelper.Clamp(((ray.D.X * r + 1) * sky.width / 2), 0, sky.width - 1);
+            // schaal y naar de grootte van de afbeelding
             float y = MathHelper.Clamp(((ray.D.Y * r + 1) * sky.height / 2), 0, sky.height - 1);
+            // geef de kleur van de afbeelding op het berekende punt terug
             Color col = sky.bmp.GetPixel((int)x, (int)y);
             return new Vector3(col.R, col.G, col.B);
         }
