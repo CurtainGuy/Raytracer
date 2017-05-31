@@ -9,7 +9,8 @@ namespace Template
 {
     public class LightSource
     {
-        // Note: onzeker of Vector3 of float3 moet worden gebruikt. 
+        // In lightsource gebeurd vrij weinig. Dit bevat alleen informatie en had achteraf waarschijnlijk een struct kunnen zijn.
+        // We're in too deep now...
         Vector3 position;
         Vector3 color;
         float intensity;
