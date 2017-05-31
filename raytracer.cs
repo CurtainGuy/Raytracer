@@ -5,74 +5,107 @@ using OpenTK;
 
 namespace Template
 {
-
+    // Raytracer beheert de camera, de scene en tekent alle rays. 
     class Raytracer
     {
-        // member variables
+        // Member variabelen
         public Surface screen;
         
         public Camera camera;
         public Scene scene;
+
+        // In het debugscherm zijn deze coördinaten het middenpunt. Hier staat de camera op. 
+        // Zijn veel gehardcode. Niet aangeraden om te veranderen...
 
         public int CameraX = 767;
         public int CameraZ = 500;
 
         Surface pattern;
         Surface sky;
-
-        // distance from camera to screen (change FOV by changing distance)
+        
+        // Variabelen die aangepast kunnen worden.:
+        //--------------------------------------------------------------
+        // Field of View in graden. 
         public float fov = 90;
+
+
+        // De coördinaten van het punt waar de camera naar kijkt. 
+        public float xrichting = 0;
+        public float yrichting = 0;
+        public float zrichting = 1;
+        // Het aantal keer dat een secondary ray gemaakt mag worden.
         int maxRecursion = 10;
-        // initialize
+
+        
+        //---------------------------------------------------------------
+
+
         public void Init()
         {
+            Vector3 camerarichting = new Vector3(xrichting, yrichting, zrichting);
+            camerarichting.Normalize();
 
-            // the camera from where you see the scene
-            camera = new Camera(new Vector3(0, 0, 0), new Vector3(0, 0, 1), fov);
+            // De camera wordt aangemaakt. Startpositie is 0,0,0. Richting is naar de Z-richting. 
+            camera = new Camera(new Vector3(0, 0, 0), camerarichting, fov);
             
             scene = new Scene(camera.CameraPosition);
-
+            // Het scherm bestaat uit twee 512 bij 512 dingen.
             screen = new Surface(1024, 512);
             
-
+            // De patronen.
             pattern = new Surface("../../assets/pattern.png");
             sky = new Surface("../../assets/stpeters_probe.png");
+
+            // Render wordt aangeroepen bij het aanmaken.
             Render();
         }
-        // tick: renders one frame
+        
         public void Tick()
         {
             DrawDebug();
             
-            //camera coordinates
-            screen.Print("Cameraposition:" + camera.cameraPosition, 512, 490, 0xffffff);
+            // Camera coördinaten worden afgerond op 3 decimalen en wordt geprint. 
+            screen.Print("Cameraposition:" + new Vector3((float)Math.Round(camera.CameraPosition.X, 3), 
+                (float)Math.Round(camera.CameraPosition.Y, 3), 
+                (float)Math.Round(camera.CameraPosition.Z, 3)), 
+                512, 490, 0xffffff);
         }
-        Vector3[] colors;
+
+        
         public void Render()
         {
-            colors = new Vector3[512 * 512];
-            // Dit rendert de hele scene. 
+            // Een tijdelijk array wordt gemaakt om de kleuren van het scherm in te stoppen.
+            // Dit zorgt ervoor dat de debug niet over het scherm wordt geprint.
+            Vector3[] colors = new Vector3[512 * 512];
+
+            // De i houdt bij welke positie van de array er wordt gebruikt. 
             int i = 0;
             for (int y = 0; y < 512; y++)
             {
                 for (int x = 0; x < 512; x++)
                 {
-                    // De rays zijn opgeslagen in een array in camera. 
+                    // De camera heeft de richtingen per pixel opgeslagen in een array, en maakt hier nu een ray van. 
                     Ray ray = camera.SendRay(i);
+
+                    // Elke zoveel rays op y = 256 worden getekent.
                     if (y == 256 && x % 20 == 0)
                     {
+                        // De uiteindelijke kleur van de ray wordt hier opgeslagen.
                         colors[i] = Trace(ray, true, maxRecursion);
+                        // De primary rays beginnen met een rood cirkelsegment van lengte 1, zoals in de opdracht vermeld wordt.
                         DrawDebugRay(new Ray(ray.O, ray.D, 1), new Vector3(255,0,0));
                     }
                     else
+                        // Als het nit in de debug getekent moet worden wordt er false meegegeven.
                         colors[i] = Trace(ray, false, maxRecursion);
-
-
                     i++;
                 }
                 
             }
+            // Vervolgens worden de camera, screen en primitives (alleen spheres) getekent. 
             DrawDebug();
+
+            // Tenslotte wordt de scene echt geplot.
             i = 0;
             for (int y = 0; y < 512; y++)
             {
@@ -85,29 +118,32 @@ namespace Template
         }
 
         // De trace functie van de slides.
-        // TO DO: Recursie cappen.
         Vector3 Trace(Ray ray, bool debug, int recursion)
         {
-            
-        Intersection I = SearchIntersect(ray);
+            // Er wordt naar een Intersection gezocht
+            Intersection I = SearchIntersect(ray);
 
+            // Als er geen intersectie is gevonden...
             if (I.p == null)
             {
+                // Tekent hij voor debugrays ook de rays in de debugwindow.
                 if (debug)
                 {
+                    // Primary rays zijn anders getekent.
                     if (recursion == maxRecursion)
                         DrawDebugRay(new Ray(ray.D + ray.O, ray.D, ray.t - 1), new Vector3(255, 255, 0));
                     else
                         DrawDebugRay(ray, new Vector3(0, 255, 0));
 
                 }
-                return CreateSkyDome(ray); // SkyDome
+                // Als er niets wordt gevonden, wordt de skydome getekent.
+                return CreateSkyDome(ray);
             }
             Vector3 color = I.p.color;
+            // Als het geintersecte object een mirror is....
             if (I.p.Mirror)
             {
-                
-
+                // Tekent hij voor debugrays ook de rays in de debugwindow.
                 if (debug)
                 {
                     if (recursion == maxRecursion)
@@ -115,10 +151,13 @@ namespace Template
                     else
                         DrawDebugRay(new Ray(ray.O, ray.D, I.d), new Vector3(0, 255, 0));
                 }
+
+                // Als recursie kleiner dan 0 is, dan wordt er zwart getekent.
                 if (recursion < 0)
                 {
                     return Vector3.Zero;
                 }
+
                 // Methode om een ray te reflecteren.
                 // de kleur van de gereflecteerde ray vermenigvuldigd met hoe sterk de reflectie is
                 // de kleur van het object wordt vermenigvuldigd met hoe sterk de absorptie is
@@ -135,13 +174,15 @@ namespace Template
                     else
                         DrawDebugRay(new Ray(ray.O, ray.D, I.d), new Vector3(0, 255, 0));
                 }
+                // PLanes hebben een patroon nodig.
                 if (I.p is Plane)
                     return (DirectIllumination(I, debug) * CreatePattern(I.i));
                 
-                return (DirectIllumination(I, debug) * color);
+                return (DirectIllumination(I, debug) * I.p.color);
             }
         }
 
+        // Methode om een ray te reflecten. Geheel volgens de slides.
         public Ray Reflect(Ray ray, Intersection I)
         {
             Ray seccondaryRay = new Ray();
@@ -151,6 +192,8 @@ namespace Template
             return seccondaryRay;
         }
 
+
+        // Methode om refracted ray te berekenen. Nog niet geimplementeerd. 
         public Ray Refract(Ray ray, Intersection I, float N1, float N2)
         {
             float angle1 = Vector3.Dot(I.n, ray.D) / (I.n.Length * ray.D.Length);
@@ -165,39 +208,46 @@ namespace Template
             return new Ray(I.i, refractive, ray.t);
         }
         
+        // Berekent de belichting na een intersectie. 
         Vector3 DirectIllumination(Intersection I, bool debug)
         {
             Vector3 illumination = new Vector3(0, 0, 0);
+            // Maakt een shadowray 
             Ray shadowRay = new Ray();
             foreach (LightSource light in scene.lightsources)
             {
-                // create a shadowray
+                // Veranderd de shadowray voor elke lightsource.
                 shadowRay.D = light.Position - I.i;
                 shadowRay.O = I.i;
                 shadowRay.t = shadowRay.D.Length;
                 shadowRay.D.Normalize();
+
+                // Shadowray wordt getekent bij debug.
                 if(debug)
                     DrawDebugRay(new Ray(I.i, shadowRay.D, shadowRay.t), new Vector3(200, 200, 200));
-                // check of de lightsource visible is, zo niet, return zwart
+
+                // Checkt of de lightsource visible is, zo niet, return zwart
                 if (!IsVisible(I, shadowRay)) continue; // Zwart.
 
+                // Berekent de kleur naar de slides' methode.
                 float attenuation = light.Intensity / (shadowRay.t * shadowRay.t);
                 float NdotL = Vector3.Dot(I.n, shadowRay.D);
                 if (NdotL < 0) continue;
-                // Dotproduct of the normal of the intersection and shadowray
+                // Dotproduct van de normaal van de intersectie en de shadowray.
                 illumination = light.Color * attenuation * NdotL;
                 continue;
             }
 
             return illumination; 
         }
-
-        // Checks to see if the line between the light source and a point is unobstructed.
+        
+        // Kijkt of de lijn tussen het lichtpuntje en een punt niet wordt verhinderd.
         public bool IsVisible(Intersection I, Ray shadowRay)
         {
             float tMin = int.MaxValue;
             foreach (Primitive p in scene.primitives)
             {
+                // De dichtbijzijnde intersectie wordt genomen.
                 float t = p.Intersect(shadowRay).d;
                 if (t > 0 && t < tMin)
                     tMin = t;
@@ -247,26 +297,32 @@ namespace Template
             screen.Plot(CameraX, CameraZ, FixColor(new Vector3(255,255,255)));
             screen.Line(CameraX + (int)(camera.screenCorner0.X)*48, CameraZ - 48 - (int)(camera.screenCorner0.Z)*48,
                 CameraX + (int)(camera.screenCorner1.X)*48, CameraZ - 48 - (int)(camera.screenCorner1.Z)*48, FixColor(new Vector3(255, 255, 255)));
-
+            
+            // Eerst worden de spheres gefilterd uit de lijst van primitieven.
             List<Sphere> spheres = new List<Sphere>();
             foreach(Primitive p in scene.primitives)
             {
                 if (p.type == Type.Sphere)
                     spheres.Add((Sphere)p);
             }
+            // Een kleine hoek wordt vantevoren berekent.
             float angle = 2 * (float)Math.PI / 100;
+
+            // Voor elke sphere wordt het getekent in de debug window op y = cameraposition.Y
             foreach (Sphere s in spheres)
             {
+                // Normale spheres worden getekent met hun eigen kleur. Mirrors worden altijd lichtblauw getekent.
                 Vector3 c = s.color;
                 if (s.Mirror)
                     c = new Vector3(240,255,255);
-
+                
+                // Omdat de grootte van de cirkel veranderd met de camerapositie.Y, moet er een nieuwe radius berekent worden.
                 float newradius = (float)Math.Sqrt((s.Radius * s.Radius) - ((s.Origin.Y - camera.cameraPosition.Y) * (s.Origin.Y - camera.cameraPosition.Y)));
                 if(newradius > 0)
                 {
                     for (int a = 0; a < 100; a++)
                     {
-                        // Draws a linepiece between two circlepoints.
+                        // Tekent voor elke deel van de cirkel. 100 segmenten. Dure operatie...
                         screen.Line(ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos(a * angle))),
                             ConverttoDebugY((float)(s.origin.Z + newradius * Math.Sin(a * angle))),
                             ConverttoDebugX((float)(s.origin.X + newradius * Math.Cos((a + 1) * angle))),
@@ -286,6 +342,7 @@ namespace Template
             return (int)(500 - (z * 48));
         }
 
+        // Veranderd de kleur van Vectoren naar ints.
         public int FixColor(Vector3 color)
         {
             if (color.X > 255) color.X = 255;
@@ -294,12 +351,14 @@ namespace Template
             return ((int)color.X << 16) + ((int)color.Y << 8) + (int)(color.Z);
         }
 
+        // Maakt het patroon.
         public Vector3 CreatePattern(Vector3 P)
         {
             Vector2 point = new Vector2(P.X, P.Z);
             int x = (int)Math.Round(point.X * pattern.width - 0.5);
 
             // zorg er voor dat x binnen het bereik van de afbeelding blijft, aangezien de plane oneindig lang is
+
             while (x < 0)
             {
                 x += pattern.width;
@@ -310,7 +369,9 @@ namespace Template
             }
 
             int y = (int)Math.Round(point.Y * pattern.height - 0.5);
+
             // zorg er voor dat y binnen het bereik van de afbeelding blijft, aangezien de plane oneindig lang is
+
             while (y < 0)
             {
                 y += pattern.height;
@@ -325,6 +386,7 @@ namespace Template
             return new Vector3(col.R, col.G, col.B);
         }
 
+        // Kijkt waar een ray intersect met de skydome. Return de kleur.
         public Vector3 CreateSkyDome(Ray ray)
         {
             //formule van de gegeven site
@@ -338,5 +400,4 @@ namespace Template
             return new Vector3(col.R, col.G, col.B);
         }
     }
-
-} // namespace Template
+}
